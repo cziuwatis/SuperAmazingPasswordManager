@@ -143,6 +143,7 @@ public class Terminal {
             text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
         }
         this.outputWriter.print(text);
+        this.outputWriter.flush();
     }
 
     public void warn(String text) {
@@ -153,6 +154,7 @@ public class Terminal {
             text = COLOR_YELLOW + "[Warning] " + text + COLOR_RESET;
         }
         this.outputWriter.print(text);
+        this.outputWriter.flush();
     }
 
     public void error(String text) {
@@ -163,6 +165,7 @@ public class Terminal {
             text = COLOR_RED + "[Error] " + text + COLOR_RESET;
         }
         this.errorWriter.print(text);
+        this.errorWriter.flush();
     }
 
 }
