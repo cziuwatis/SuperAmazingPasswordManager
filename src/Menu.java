@@ -1,6 +1,8 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -18,12 +20,15 @@ public class Menu
     /*
      *  CONSTANTS
      */
-    private static final char HELP_CHAR = '4';
-    private static final char QUIT_CHAR = '5';
+    private static final char HELP_CHAR = 'H';
+    private static final char QUIT_CHAR = 'Q';
+    private static final char BACK_CHAR = 'B';
     private static final String ERR_CMD = "\t[!] Invalid command entered!";
     private static final String INPUT_PROMPT = "Enter >> ";
     private static final String HELP_TEXT = "";
-    private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n 4. Help\n 5. Quit";
+    private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n H. Help\n Q. Quit";
+    private static final String EDIT_PASSWORDS_MENU_OPTIONS = " 1. Edit password title\n 2. Edit password website\n 3. Edit password password\n B. Back";
+    private static final String VIEW_PASSWORDS_MENU_OPTIONS = " 1. View all entries\n 2. Search by title\n 3. Search by website\n B. Back";
     private static final String DEFAULT_BORDER = "-";
     private static final int DEFAULT_BORDER_LENGTH = 90;
 
@@ -55,9 +60,9 @@ public class Menu
         {
             Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, MAIN_MENU_OPTIONS, "MAIN MENU");
             String command = terminal.readLine(INPUT_PROMPT);
-            if (command.length() == 1)
+            if (command.trim().length() == 1)
             {
-                switch (command.charAt(0))
+                switch (command.trim().toUpperCase().charAt(0))
                 {
                     case '1':
                     {
@@ -66,12 +71,12 @@ public class Menu
                     }
                     case '2':
                     {
-                        exercise2();
+                        viewPasswords();
                         break;
                     }
                     case '3':
                     {
-                        exercise2();
+                        editPasswords();
                         break;
                     }
                     case HELP_CHAR:
@@ -90,7 +95,6 @@ public class Menu
                         break;
                     }
                 }
-                terminal.info("Press any key to continue\n");
             }
             else
             {
@@ -118,12 +122,14 @@ public class Menu
         Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
         try
         {
-            passwords.addNewPassword("Unset", "Unset", "Unset");
+            passwords.addNewPassword("Unset", "Unset", "!2345678testpassword");
             int newPasswordId = passwords.getLatestPasswordId();
-            passwords.editPasswordTitle(newPasswordId, terminal.readLine("Enter the title for the password >>"));
+            passwords.editPasswordTitle(newPasswordId, terminal.readLine("\nEnter the title for the password >>"));
             passwords.editPasswordWebsite(newPasswordId, terminal.readLine("Enter the website for the password >>"));
             passwords.editPasswordPassword(newPasswordId, terminal.readPassword("Enter the actual password >>"));
-            terminal.info("Congratz mate, ya password is safe with us yarr.");
+            terminal.info("\nCongratz mate, ya password is safe with us yarr.\n");
+            displayPasswordDetails(newPasswordId);
+            terminal.info("\n");
         }
         catch (IllegalArgumentException e)
         {
@@ -133,11 +139,237 @@ public class Menu
     }
 
     /**
-     * Runs question 2.
+     * Option to view passwords
      */
-    private void exercise2()
+    private void viewPasswords()
     {
+        boolean runMenu = true;
+        while (runMenu)
+        {
+            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, VIEW_PASSWORDS_MENU_OPTIONS, "VIEW PASSWORDS MENU");
+            String command = terminal.readLine(INPUT_PROMPT);
+            if (command.trim().length() == 1)
+            {
+                switch (command.trim().toUpperCase().charAt(0))
+                {
+                    case '1':
+                    {
+                        viewAllEntries();
+                        break;
+                    }
+                    case '2':
+                    {
+                        searchByTitle();
+                        break;
+                    }
+                    case '3':
+                    {
+                        searchByWebsite();
+                        break;
+                    }
+                    case BACK_CHAR:
+                    {
+                        runMenu = false;
+                        break;
+                    }
+                    default:
+                    {
+                        terminal.error(ERR_CMD);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                terminal.error(ERR_CMD);
+            }
+        }
+    }
 
+    public void searchByTitle()
+    {
+        ArrayList<StoredPassword> searchPasswords = passwords.getUserPasswords(terminal.readLine("Enter title to search for >>"), new TitleSearchFilter());
+        displayEntries(searchPasswords, true);
+        if (searchPasswords.size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >>"))
+        {
+            displayEntries(searchPasswords, false);
+        }
+        searchPasswords = null;
+    }
+
+    public void searchByWebsite()
+    {
+        ArrayList<StoredPassword> searchPasswords = passwords.getUserPasswords(terminal.readLine("Enter website to search for >>"), new WebsiteSearchFilter());
+        displayEntries(searchPasswords, true);
+        if (searchPasswords.size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >>"))
+        {
+            displayEntries(searchPasswords, false);
+        }
+        searchPasswords = null;
+    }
+
+    public void viewAllEntries()
+    {
+        displayEntries(passwords.getUserPasswords(), true);
+        if (passwords.getUserPasswords().size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >>"))
+        {
+            displayEntries(passwords.getUserPasswords(), false);
+        }
+    }
+
+    public void displayEntries(List<StoredPassword> entries, boolean hidePassword)
+    {
+        Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
+        terminal.info("\n");
+        terminal.info(String.format("%-7s  %-20s  %-30s     %s\n", "ID", "   Title", "  Website", "Password"));
+        Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
+        terminal.info("\n");
+        for (StoredPassword entry : entries)
+        {
+            String password = "**********";
+            if (!hidePassword)
+            {
+                password = entry.getPassword();
+            }
+            terminal.info(String.format("%-7d | %-20s | %-30s | %s\n", entry.getId(), Utilities.cutAndAppendString(entry.getTitle(), 20 - 2, ".."), Utilities.cutAndAppendString(entry.getWebsite(), 30 - 2, ".."), password));
+            password = null; //to remove from memory?
+        }
+        Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
+        terminal.info("\n");
+    }
+
+    /**
+     * Option to edit passwords
+     */
+    private void editPasswords()
+    {
+        boolean runMenu = true;
+        while (runMenu)
+        {
+            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, EDIT_PASSWORDS_MENU_OPTIONS, "EDIT PASSWORDS MENU");
+            String command = terminal.readLine(INPUT_PROMPT);
+            if (command.trim().length() == 1)
+            {
+                switch (command.trim().toUpperCase().charAt(0))
+                {
+                    case '1':
+                    {
+                        editPasswordTitle();
+                        break;
+                    }
+                    case '2':
+                    {
+                        editPasswordWebsite();
+                        break;
+                    }
+                    case '3':
+                    {
+                        editPasswordPassword();
+                        break;
+                    }
+                    case BACK_CHAR:
+                    {
+                        runMenu = false;
+                        break;
+                    }
+                    default:
+                    {
+                        terminal.error(ERR_CMD);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                terminal.error(ERR_CMD);
+            }
+        }
+    }
+
+    public boolean confirmPassword(int passwordId)
+    {
+        if (displayPasswordDetails(passwordId))
+        {
+            if (Utilities.getYesNoAnswer(terminal, "Is this the correct entry? >>"))
+            {
+                return true;
+            }
+            else
+            {
+                terminal.info("Entry not confirmed\n");
+            }
+        }
+        else
+        {
+            terminal.info("Password with such id doesn't exist\n");
+        }
+        return false;
+    }
+
+    public boolean displayPasswordDetails(int passwordId)
+    {
+        String[] passwordDetails = passwords.getPasswordDetails(passwordId);
+        if (passwordDetails != null)
+        {
+            terminal.info("Title        : " + passwordDetails[0]
+                    + "\nWebsite      : " + passwordDetails[1]
+                    + "\nLast updated : " + passwordDetails[2]
+                    + "\n");
+            return true;
+        }
+        return false;
+    }
+
+    public void editPasswordTitle()
+    {
+        int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
+        terminal.info("You are about to edit this entry:\n");
+        if (confirmPassword(passwordId))
+        {
+            //edit title
+            try
+            {
+                passwords.editPasswordTitle(passwordId, terminal.readLine("Enter new title >>"));
+            }
+            catch (IllegalArgumentException e)
+            {
+                terminal.error(e.getMessage());
+            }
+        }
+    }
+
+    public void editPasswordWebsite()
+    {
+        int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
+        terminal.info("You are about to edit this entry:\n");
+        if (confirmPassword(passwordId))
+        {
+            try
+            {
+                passwords.editPasswordWebsite(passwordId, terminal.readLine("Enter new website >>"));
+            }
+            catch (IllegalArgumentException e)
+            {
+                terminal.error(e.getMessage());
+            }
+        }
+    }
+
+    public void editPasswordPassword()
+    {
+        int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
+        terminal.info("You are about to edit this entry:\n");
+        if (confirmPassword(passwordId))
+        {
+            try
+            {
+                passwords.editPasswordPassword(passwordId, terminal.readLine("Enter new password >>"));
+            }
+            catch (IllegalArgumentException e)
+            {
+                terminal.error(e.getMessage());
+            }
+        }
     }
 
     /**

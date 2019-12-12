@@ -31,6 +31,11 @@ public final class StoredPassword
         return true; //TODO check password strength
     }
 
+    public static int getHighestTotalId()
+    {
+        return totalIds;
+    }
+
     public StoredPassword(int id, String title, String website, String password, LocalDateTime lastUpdated)
     {
         this.setId(id);
@@ -51,7 +56,7 @@ public final class StoredPassword
 
     public StoredPassword(String title, String website, String password)
     {
-        this.setId(totalIds++);
+        this.setId(++totalIds);
         this.setTitle(title);
         this.setWebsite(website);
         this.setPassword(password);
@@ -99,19 +104,16 @@ public final class StoredPassword
 
     public void setWebsite(String website)
     {
-        Pattern urlRegex = Pattern.compile("^(https?://)?([a-zA-z0-9.-]+)(:[0-9]{1,4})?$");
+        Pattern urlRegex = Pattern.compile("^(https?://)?([a-zA-Z0-9.-]+)(:[0-9]{1,4})?$");
         Matcher matcher = urlRegex.matcher(website);
         if (!matcher.matches())
         {
             throw new IllegalArgumentException("Invalid URL.");
         }
         String hostname = matcher.group(2);
-        for (int i = 0; i < hostname.length() - 1; i++)
+        if (hostname.matches("(\\.){2,}"))
         {
-            if (hostname.charAt(i) == hostname.charAt(i + 1))
-            {
-                throw new IllegalArgumentException("Invalid URL.");
-            }
+            throw new IllegalArgumentException("Invalid URL. Can't have 2 consecutive dots in the hostname");
         }
         this.website = website;
         this.setLastUpdated();

@@ -70,12 +70,25 @@ public class PasswordStorage
         return false;
     }
 
-    public String getPasswordWebsite(int id)
+//    public String getPasswordWebsite(int id)
+//    {
+//        StoredPassword userPassword = findStoredPassword(id);
+//        if (userPassword != null)
+//        {
+//            return userPassword.getWebsite();
+//        }
+//        return null;
+//    }
+    public String[] getPasswordDetails(int id)
     {
         StoredPassword userPassword = findStoredPassword(id);
         if (userPassword != null)
         {
-            return userPassword.getWebsite();
+            String[] details = new String[3];
+            details[0] = userPassword.getTitle();
+            details[1] = userPassword.getWebsite();
+            details[2] = userPassword.getLastUpdated().toString();
+            return details;
         }
         return null;
     }
@@ -105,6 +118,24 @@ public class PasswordStorage
         {
             this.userPasswords.remove(this.userPasswords.size() - 1);
         }
+    }
+
+    public ArrayList<StoredPassword> getUserPasswords()
+    {
+        return this.userPasswords;
+    }
+
+    public ArrayList<StoredPassword> getUserPasswords(String searchString, PasswordSearchFilter filter)
+    {
+        ArrayList<StoredPassword> passwords = new ArrayList<>();
+        for (StoredPassword userPassword : this.userPasswords)
+        {
+            if (filter.getProperty(userPassword).toLowerCase().contains(searchString.toLowerCase()))
+            {
+                passwords.add(userPassword);
+            }
+        }
+        return passwords;
     }
 
     private StoredPassword findStoredPassword(int id)

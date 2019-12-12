@@ -8,11 +8,12 @@
  *
  * @author andrz
  */
-public class test
+public class WebsiteSearchFilter implements PasswordSearchFilter
 {
-    public static void main(String[] args)
+
+    @Override
+    public String getProperty(Object obj)
     {
-        Menu test = new Menu();
-        test.run();
+        return ((StoredPassword) obj).getWebsite();
     }
 }
