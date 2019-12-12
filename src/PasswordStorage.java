@@ -120,6 +120,22 @@ public class PasswordStorage
         }
     }
 
+    public boolean removePassword(int id)
+    {
+        int i = 0;
+        boolean isRemoved = false;
+        while (!isRemoved && i < this.userPasswords.size())
+        {
+            if (this.userPasswords.get(i).getId() == id)
+            {
+                this.userPasswords.remove(i);
+                isRemoved = true;
+            }
+            i++;
+        }
+        return isRemoved;
+    }
+
     public ArrayList<StoredPassword> getUserPasswords()
     {
         return this.userPasswords;

@@ -26,7 +26,7 @@ public class Menu
     private static final String ERR_CMD = "\t[!] Invalid command entered!";
     private static final String INPUT_PROMPT = "Enter >> ";
     private static final String HELP_TEXT = "";
-    private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n H. Help\n Q. Quit";
+    private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n 4. Remove passwords\n 5. Change master password\n H. Help\n Q. Quit";
     private static final String EDIT_PASSWORDS_MENU_OPTIONS = " 1. Edit password title\n 2. Edit password website\n 3. Edit password password\n B. Back";
     private static final String VIEW_PASSWORDS_MENU_OPTIONS = " 1. View all entries\n 2. Search by title\n 3. Search by website\n B. Back";
     private static final String DEFAULT_BORDER = "-";
@@ -77,6 +77,16 @@ public class Menu
                     case '3':
                     {
                         editPasswords();
+                        break;
+                    }
+                    case '4':
+                    {
+                        removePasswords();
+                        break;
+                    }
+                    case '5':
+                    {
+                        changeMasterPassword();
                         break;
                     }
                     case HELP_CHAR:
@@ -186,7 +196,29 @@ public class Menu
         }
     }
 
-    public void searchByTitle()
+    /**
+     * Option to remove passwords.
+     */
+    private void removePasswords()
+    {
+        int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
+        terminal.info("You are about to remove this entry:\n");
+        if (confirmPassword(passwordId))
+        {
+            if (passwords.removePassword(passwordId))
+            {
+                terminal.info("Password entry has been removed\n");
+            }
+            //fail shouldn't be possible since confirming password found it above.
+        }
+    }
+
+    private void changeMasterPassword()
+    {
+        terminal.info("you just changed your master password, well done young one\n");
+    }
+
+    private void searchByTitle()
     {
         ArrayList<StoredPassword> searchPasswords = passwords.getUserPasswords(terminal.readLine("Enter title to search for >>"), new TitleSearchFilter());
         displayEntries(searchPasswords, true);
@@ -197,7 +229,7 @@ public class Menu
         searchPasswords = null;
     }
 
-    public void searchByWebsite()
+    private void searchByWebsite()
     {
         ArrayList<StoredPassword> searchPasswords = passwords.getUserPasswords(terminal.readLine("Enter website to search for >>"), new WebsiteSearchFilter());
         displayEntries(searchPasswords, true);
@@ -208,7 +240,7 @@ public class Menu
         searchPasswords = null;
     }
 
-    public void viewAllEntries()
+    private void viewAllEntries()
     {
         displayEntries(passwords.getUserPasswords(), true);
         if (passwords.getUserPasswords().size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >>"))
@@ -217,7 +249,7 @@ public class Menu
         }
     }
 
-    public void displayEntries(List<StoredPassword> entries, boolean hidePassword)
+    private void displayEntries(List<StoredPassword> entries, boolean hidePassword)
     {
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");
@@ -286,7 +318,7 @@ public class Menu
         }
     }
 
-    public boolean confirmPassword(int passwordId)
+    private boolean confirmPassword(int passwordId)
     {
         if (displayPasswordDetails(passwordId))
         {
@@ -306,7 +338,7 @@ public class Menu
         return false;
     }
 
-    public boolean displayPasswordDetails(int passwordId)
+    private boolean displayPasswordDetails(int passwordId)
     {
         String[] passwordDetails = passwords.getPasswordDetails(passwordId);
         if (passwordDetails != null)
@@ -320,7 +352,7 @@ public class Menu
         return false;
     }
 
-    public void editPasswordTitle()
+    private void editPasswordTitle()
     {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
@@ -338,7 +370,7 @@ public class Menu
         }
     }
 
-    public void editPasswordWebsite()
+    private void editPasswordWebsite()
     {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
@@ -355,7 +387,7 @@ public class Menu
         }
     }
 
-    public void editPasswordPassword()
+    private void editPasswordPassword()
     {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >>", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
