@@ -1,3 +1,4 @@
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -5,143 +6,153 @@ import java.util.Scanner;
 /**
  * Menu class.
  *
- * <p>Handles all menu functions.</p>
+ * <p>
+ * Handles all menu functions.</p>
  *
  * @author Luke Halpenny
  * @version 1.0
  */
-public class Menu {
+public class Menu
+{
 
     /*
      *  CONSTANTS
      */
-    private static final char HELP_CHAR = '3';
-    private static final char QUIT_CHAR = '4';
-    private static final String FILE_PATH = "ciphertext.txt";
-    private static final String ERR_FNF = "\t[!] File not found!";
+    private static final char HELP_CHAR = '4';
+    private static final char QUIT_CHAR = '5';
     private static final String ERR_CMD = "\t[!] Invalid command entered!";
-    private static final String INPUT_PROMPT = ">> ";
+    private static final String INPUT_PROMPT = "Enter >> ";
+    private static final String HELP_TEXT = "";
+    private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n 4. Help\n 5. Quit";
+    private static final String DEFAULT_BORDER = "-";
+    private static final int DEFAULT_BORDER_LENGTH = 90;
 
     /*
      *  FIELDS
      */
     private boolean running;
-    private Scanner input;
-    private File fileObj;
-    private String[] fileLines;
+    private PasswordStorage passwords;
+    private final Terminal terminal;
 
     /**
      * Constructor for Menu class.
      */
-    public Menu() {
-        this.input = new Scanner(System.in);
-        this.fileObj = new File(FILE_PATH);
-        try (Scanner fileIn = new Scanner(fileObj)) {
-            this.fileLines = readLines(fileIn);
-        } catch (FileNotFoundException e) {
-            System.err.println(ERR_FNF);
-            System.err.printf("\tCannot find file: %s\n", FILE_PATH);
-            System.exit(0);
-        }
+    public Menu()
+    {
+        this.running = false;
+        this.terminal = new Terminal();
+        this.passwords = new PasswordStorage(); //@TODO read in passwords
     }
 
     /**
-     * Main method, starts event loop of Menu. Blocks until exit command is entered.
+     * Main method, starts event loop of Menu. Blocks until exit command is
+     * entered.
      */
-    public void run() {
+    public void run()
+    {
         this.running = true;
-        while (this.running) {
-            printMenu();
-            System.out.print(INPUT_PROMPT);
-            String command = input.nextLine();
-            if(command.length() == 1) {
-                switch (command.charAt(0)) {
-                    case '1': {
-                        exercise1();
+        while (this.running)
+        {
+            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, MAIN_MENU_OPTIONS, "MAIN MENU");
+            String command = terminal.readLine(INPUT_PROMPT);
+            if (command.length() == 1)
+            {
+                switch (command.charAt(0))
+                {
+                    case '1':
+                    {
+                        addNewPassword();
                         break;
                     }
-                    case '2': {
+                    case '2':
+                    {
                         exercise2();
                         break;
                     }
-                    case HELP_CHAR: {
-                        printHelp();
+                    case '3':
+                    {
+                        exercise2();
                         break;
                     }
-                    case QUIT_CHAR: {
+                    case HELP_CHAR:
+                    {
+                        Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, HELP_TEXT, "HELP TEXT");
+                        break;
+                    }
+                    case QUIT_CHAR:
+                    {
                         exit();
                         break;
                     }
-                    default: {
-                        System.err.println(ERR_CMD);
+                    default:
+                    {
+                        terminal.error(ERR_CMD);
                         break;
                     }
                 }
-                System.out.println("Press any key to continue");
-                input.nextLine();
-            } else {
-                System.err.println(ERR_CMD);
+                terminal.info("Press any key to continue\n");
+            }
+            else
+            {
+                terminal.error(ERR_CMD);
             }
         }
     }
 
     /**
-     * Prints Menu text.
-     */
-    private void printMenu() {
-        System.out.println();
-        System.out.println("SHIFT CIPHER CA");
-        System.out.println("-----------------------------");
-        System.out.println("1. Decode caesar cipher");
-        System.out.println("2. Crack shift cipher");
-        System.out.println("3. Help");
-        System.out.println("4. Quit");
-    }
-
-    /**
-     * Prints help text for Menu.
-     */
-    private void printHelp() {
-        System.out.println();
-        System.out.println("Help:");
-        System.out.println("Shift Cipher CA.");
-        System.out.println("This program decrypts the file ciphertext.txt from the moodle.");
-        System.out.println("There is a separate option for each question, as well as help and quit.");
-        System.out.println("The class created can be used to encrypt, decypt or crack anything using shift cipher.");
-        System.out.println("-----------------------------");
-    }
-
-    /**
      * Exits from main event loop.
      */
-    private void exit() {
-        System.out.println("Goodbye!");
+    private void exit()
+    {
+        terminal.info("Goodbye!");
         this.running = false;
     }
 
     /**
-     * Runs question 1.
+     * Adding a new password option.
      */
-    private void exercise1() {
-
+    private void addNewPassword()
+    {
+        Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
+        terminal.info("\nAdding a new password\n");
+        Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
+        try
+        {
+            passwords.addNewPassword("Unset", "Unset", "Unset");
+            int newPasswordId = passwords.getLatestPasswordId();
+            passwords.editPasswordTitle(newPasswordId, terminal.readLine("Enter the title for the password >>"));
+            passwords.editPasswordWebsite(newPasswordId, terminal.readLine("Enter the website for the password >>"));
+            passwords.editPasswordPassword(newPasswordId, terminal.readPassword("Enter the actual password >>"));
+            terminal.info("Congratz mate, ya password is safe with us yarr.");
+        }
+        catch (IllegalArgumentException e)
+        {
+            terminal.error(e.getMessage());
+            passwords.removeLatestPassword(); //remove latest added password
+        }
     }
 
     /**
      * Runs question 2.
      */
-    private void exercise2() {
+    private void exercise2()
+    {
 
     }
 
     /**
-     * Reads in lines from a Scanner stream, returning them as a String[] object. Designed for reading text files.
+     * Reads in lines from a Scanner stream, returning them as a String[]
+     * object. Designed for reading text files.
+     *
      * @param input Scanner input to read from
      * @return String[] of lines from scanner.
      */
-    private String[] readLines(Scanner input) {
+    private String[] readLines(Scanner input)
+    {
         int count = 0;
         String fullRead = "";
-        while(input.hasNextLine()) {
+        while (input.hasNextLine())
+        {
             fullRead += input.nextLine() + "\n";
             count++;
         }
@@ -149,7 +160,8 @@ public class Menu {
         input.close();
         input = null;
         input = new Scanner(fullRead);
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             out[i] = input.nextLine();
         }
         return out;

@@ -142,7 +142,7 @@ public class Terminal {
         if(!this.supportsAnsi) {
             text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
         }
-        this.outputWriter.println(text);
+        this.outputWriter.print(text);
     }
 
     public void warn(String text) {
@@ -152,7 +152,7 @@ public class Terminal {
         } else {
             text = COLOR_YELLOW + "[Warning] " + text + COLOR_RESET;
         }
-        this.outputWriter.println(text);
+        this.outputWriter.print(text);
     }
 
     public void error(String text) {
@@ -162,7 +162,7 @@ public class Terminal {
         } else {
             text = COLOR_RED + "[Error] " + text + COLOR_RESET;
         }
-        this.errorWriter.println(text);
+        this.errorWriter.print(text);
     }
 
 }
