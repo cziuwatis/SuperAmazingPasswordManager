@@ -1,3 +1,5 @@
+import sun.rmi.runtime.Log;
+
 import java.io.Console;
 import java.util.Scanner;
 
@@ -42,13 +44,9 @@ public class Main {
 
     public static void main(String[] args) {
         Terminal terminal = new Terminal();
-        terminal.info("Info text");
-        terminal.warn("Warning text");
-        terminal.error("Error text");
-        String text = terminal.readLine("Enter text >> ");
-        terminal.info(text);
-        String password = terminal.readPassword("Enter password >> ");
-        terminal.warn(password);
+        Login login = new Login(terminal);
+        boolean success = login.login();
+        terminal.warn(success +"\n");
     }
 
 }
