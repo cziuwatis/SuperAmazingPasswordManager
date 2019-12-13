@@ -68,12 +68,16 @@ public final class StoredPassword
         return this.id;
     }
 
-    public void setId(int id)
-    {
+    public static void validateId(int id) {
         if (id < 1)
         {
             throw new IllegalArgumentException("ID must be greater than 0.");
         }
+    }
+
+    public void setId(int id)
+    {
+        validateId(id);
         if (id > totalIds)
         {
             totalIds = id;
@@ -87,12 +91,16 @@ public final class StoredPassword
         return this.title;
     }
 
-    public void setTitle(String title)
-    {
+    public static void validateTitle(String title) {
         if (title.length() > 255)
         {
             throw new IllegalArgumentException("Title must be smaller than 255 characters.");
         }
+    }
+
+    public void setTitle(String title)
+    {
+        validateTitle(title);
         this.title = title;
         this.setLastUpdated();
     }
@@ -102,8 +110,7 @@ public final class StoredPassword
         return this.website;
     }
 
-    public void setWebsite(String website)
-    {
+    public static void validateWebsite(String website) {
         Pattern urlRegex = Pattern.compile("^(https?://)?([a-zA-Z0-9.-]+)(:[0-9]{1,4})?$");
         Matcher matcher = urlRegex.matcher(website);
         if (!matcher.matches())
@@ -115,6 +122,11 @@ public final class StoredPassword
         {
             throw new IllegalArgumentException("Invalid URL. Can't have 2 consecutive dots in the hostname");
         }
+    }
+
+    public void setWebsite(String website)
+    {
+        validateWebsite(website);
         this.website = website;
         this.setLastUpdated();
     }
@@ -124,8 +136,7 @@ public final class StoredPassword
         return this.password;
     }
 
-    public void setPassword(String password)
-    {
+    public static void validatePassword(String password) {
         if (password.isEmpty())
         {
             throw new IllegalArgumentException("Password can not be empty.");
@@ -134,6 +145,11 @@ public final class StoredPassword
         {
             throw new IllegalArgumentException("Password too weak.");
         }
+    }
+
+    public void setPassword(String password)
+    {
+        validatePassword(password);
         this.password = password;
         this.setLastUpdated();
     }
@@ -145,6 +161,9 @@ public final class StoredPassword
 
     public void setLastUpdated(LocalDateTime lastUpdated)
     {
+        if(lastUpdated == null) {
+            throw new IllegalArgumentException("Last Updated can not be null.");
+        }
         this.lastUpdated = lastUpdated;
     }
 
