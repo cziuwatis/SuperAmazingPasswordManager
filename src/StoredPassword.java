@@ -1,4 +1,5 @@
 
+import javax.rmi.CORBA.Util;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +29,27 @@ public final class StoredPassword
         {
             return false;
         }
-        return true; //TODO check password strength
+        String hasNumber = "[0-9]+";
+        if(!Utilities.matchesRegex(password, hasNumber)) {
+            return false;
+        }
+        String hasLower = "[a-z]+";
+        if(!Utilities.matchesRegex(password, hasLower)) {
+            return false;
+        }
+        String hasUpper = "[A-Z]+";
+        if(!Utilities.matchesRegex(password, hasUpper)) {
+            return false;
+        }
+        String hasSymbol = "[^a-zA-z0-9]+";
+        if(!Utilities.matchesRegex(password, hasSymbol)) {
+            return false;
+        }
+        if(Utilities.isCommonPassword(password)) {
+            return false;
+        }
+
+        return true;
     }
 
     public static int getHighestTotalId()
