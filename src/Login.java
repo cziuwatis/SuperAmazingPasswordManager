@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -12,10 +11,14 @@ import java.util.Scanner;
  */
 public class Login {
 
-    public static final double BACKOFF_BASE = 2;
     public static final String LOGIN_TEXT = "Enter master password (or 'q' to quit):\n";
     public static final String LOGIN_PROMPT = ">> ";
-    public static final String ERR_FNF = "Could not load user file.\n";
+    public static final String WARN_FNF = "Could not load user file. Create one now?\n";
+    public static final String WARN_NO_USER_DATA = "Couldn't read user data. Create new user?\n\t(Note: Currently stored data will become unreadable)\n";
+    public static final String ERR_NO_USER_DATA = "Couldn't read user data.\n";
+    public static final String WARN_WEAK_PASSWORD = "Your password does not meet minimum requirements! Please use a stronger password.\n";
+    public static final String ERR_EXIT = "Exiting...";
+    public static final String ERR_WRITE = "Could not write to user file!\n";
     public static final String INCORRECT_PASSWORD = "Invalid password! Try again in %d seconds\n";
     public static final String FILE_PATH = "user.txt";
 
@@ -29,15 +32,14 @@ public class Login {
 
     private Terminal terminal;
     private int numAttempts;
-    private double backoffBase;
     private long lastAttempt;
     private String masterHash;
     private String masterSalt;
+    private String decryptSalt;
 
     public Login(Terminal terminal) {
         this.terminal = terminal;
         this.numAttempts = 0;
-        this.backoffBase = BACKOFF_BASE;
         this.lastAttempt = 0;
         this.masterSalt = null;
         this.masterHash = null;
@@ -48,39 +50,64 @@ public class Login {
             if(inFile.hasNextLine()) {
                 this.masterHash = inFile.nextLine();
             }
+            if(inFile.hasNextLine()) {
+                this.decryptSalt = inFile.nextLine();
+            }
         } catch (FileNotFoundException e) {
-            terminal.error(ERR_FNF);
+            this.terminal.warn(WARN_FNF);
+            if(Utilities.getYesNoAnswer(this.terminal, "Yes/No >> ")) {
+                this.createNewUser();
+            } else {
+                this.terminal.error(ERR_NO_USER_DATA);
+                this.terminal.error(ERR_EXIT);
+                System.exit(1);
+            }
         }
     }
 
-    public boolean login() {
-        if(this.masterHash == null) {
-            return false;
+    public String login() {
+        if(this.masterHash == null || this.masterSalt == null || this.decryptSalt == null) {
+            // Couldnt read user file
+            this.terminal.warn(WARN_NO_USER_DATA);
+            if(Utilities.getYesNoAnswer(this.terminal, "Yes/No >> ")) {
+                this.createNewUser();
+            } else {
+                this.terminal.error(ERR_NO_USER_DATA);
+                this.terminal.error(ERR_EXIT);
+                System.exit(1);
+            }
+            return null;
         }
         boolean loggedIn = false;
         while(!loggedIn) {
             this.numAttempts++;
-            terminal.info(LOGIN_TEXT);
-            String masterPassword = terminal.readPassword(LOGIN_PROMPT);
+            this.terminal.info(LOGIN_TEXT);
+            String masterPassword = this.terminal.readPassword(LOGIN_PROMPT);
             if(masterPassword.equalsIgnoreCase("q")) {
-                return false;
+                return null;
             }
-            Password pass = new Password(masterPassword, this.masterSalt);
-            String key = pass.generateHash();
-            masterPassword = null;
-            if(key.equals(this.masterHash)) {
-                return true;
-            } else {
+            try {
+                Password pass = new Password(masterPassword, this.masterSalt);
+                String key = pass.generateHash();
+                if(key.equals(this.masterHash)) {
+                    pass = new Password(masterPassword, this.decryptSalt);
+                    String decyptionKey = pass.generateHash();
+                    return decyptionKey;
+                } else {
+                    this.lastAttempt = unixTime();
+                    this.loginWait();
+                }
+            } catch (IllegalArgumentException e) {
                 this.lastAttempt = unixTime();
                 this.loginWait();
             }
         }
-        return true;
+        return null;
     }
 
     public void loginWait() {
         long waitSeconds = calcWaitSeconds();
-        terminal.warn(String.format(INCORRECT_PASSWORD, waitSeconds));
+        this.terminal.warn(String.format(INCORRECT_PASSWORD, waitSeconds));
         long nextAttempt = this.lastAttempt + waitSeconds;
         while(unixTime() < nextAttempt) {
 
@@ -90,6 +117,40 @@ public class Login {
 
     public long calcWaitSeconds() {
         return this.numAttempts > 0 ? (long) Math.pow(2, this.numAttempts - 1) : 0;
+    }
+
+    public void createNewUser() {
+        this.masterSalt = Password.generateRandomSalt();
+        this.terminal.info("Please enter a master password. This will be used to encrypt all of your passwords.\n");
+        this.terminal.info("Please use a strong password that you have not used on any other sites.\n");
+        this.terminal.info("Passwords have the following restrictions:\n");
+        this.terminal.info("\t- Minimum 8 characters\n\t- At least one uppercase letter\n" +
+                "\t- At least one lowercase letter\n\t- At least one number\n\t- At least one symbol\n" +
+                "\t- Not a commonly used password (123456, P@ssw0rd, etc.)\n");
+        String masterPassword = terminal.readPassword(LOGIN_PROMPT);
+        while(!StoredPassword.checkPasswordStrength(masterPassword)) {
+            this.terminal.warn(WARN_WEAK_PASSWORD);
+            masterPassword = terminal.readPassword(LOGIN_PROMPT);
+        }
+        Password pass = new Password(masterPassword, this.masterSalt);
+        this.masterHash = pass.generateHash();
+        this.decryptSalt = Password.generateRandomSalt();
+        this.writeToUserFile();
+    }
+
+    public void writeToUserFile() {
+        try(FileWriter fileWriter = new FileWriter(FILE_PATH);) {
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+            printWriter.println(this.masterSalt);
+            printWriter.println(this.masterHash);
+            printWriter.println(this.decryptSalt);
+            printWriter.close();
+        } catch (IOException e) {
+            this.terminal.error(ERR_WRITE);
+            this.terminal.error(ERR_EXIT);
+            System.exit(1);
+        }
+
     }
 
 

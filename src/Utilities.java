@@ -160,7 +160,7 @@ public class Utilities
     public static boolean matchesRegex(String str, String regex) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
-        return matcher.matches();
+        return matcher.find();
     }
 
     /**
@@ -179,8 +179,7 @@ public class Utilities
             }
             return false;
         } catch (FileNotFoundException e) {
-            // Cant find password list
-            return false;
+            throw new RuntimeException("Cannot find common password list"); // FileNotFoundException better but not allowed use throws keyword :c
         }
     }
 }

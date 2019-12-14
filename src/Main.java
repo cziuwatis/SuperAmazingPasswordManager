@@ -29,11 +29,6 @@ public class Main {
 //    }
 
 //    public static void main(String[] args) {
-//        Menu menu = new Menu();
-//        menu.run();
-//    }
-
-//    public static void main(String[] args) {
 //        Scanner scanner = new Scanner(System.in);
 //        System.out.println("\u001B[6n");
 //        scanner.useDelimiter("R");
@@ -43,10 +38,8 @@ public class Main {
 //    }
 
     public static void main(String[] args) {
-        Terminal terminal = new Terminal();
-        Login login = new Login(terminal);
-        boolean success = login.login();
-        terminal.warn(success +"\n");
+        Application app = new Application();
+        app.run();
     }
 
 }

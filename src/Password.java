@@ -99,11 +99,12 @@ public class Password {
    * throw an exception (the type of the exception is up
    * to you) if there is an attempt to set an WEAK password
    *
-   * @TODO Implement password strength testing
-   *
    * @param password A plaintext password.
    */
   public void setPassword(String password) {
+    if(!StoredPassword.checkPasswordStrength(password)) {
+      throw new IllegalArgumentException("Password too weak.");
+    }
     this.password = password;
   }
 
