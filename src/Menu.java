@@ -31,6 +31,7 @@ public class Menu
     private static final String VIEW_PASSWORDS_MENU_OPTIONS = " 1. View all entries\n 2. Search by title\n 3. Search by website\n B. Back";
     private static final String DEFAULT_BORDER = "-";
     private static final String DEFAULT_USER_PASSWORDS_PATH = "passwordStore.txt";
+    private static final String DEFAULT_USER_FILEPATH = "user.txt";
     private static final int DEFAULT_BORDER_LENGTH = 90;
 
     /*
@@ -178,7 +179,7 @@ public class Menu
         {
             try
             {
-                password = terminal.readLine("Enter password >> ");
+                password = terminal.readPassword("Enter password >> ");
                 StoredPassword.validatePassword(password);
                 isValid = true;
             }
@@ -295,7 +296,47 @@ public class Menu
 
     private void changeMasterPassword()
     {
-        terminal.info("you just changed your master password, well done young one\n");
+        String oldMasterSalt = null;
+        String oldMasterHash = null;
+        try (Scanner inFile = new Scanner(new File(DEFAULT_USER_FILEPATH));)
+        {
+            if (inFile.hasNextLine())
+            {
+                oldMasterSalt = inFile.nextLine();
+            }
+            if (inFile.hasNextLine())
+            {
+                oldMasterHash = inFile.nextLine();
+            }
+            if (oldMasterSalt != null && oldMasterHash != null)
+            {
+                terminal.warn("You are about to change your master password used to login into the service\n");
+                terminal.info("Please enter your current master password to proceed.\n");
+                if (new Password(getValidPasswordFromUser(), oldMasterSalt).matchesHash(oldMasterHash))
+                {
+                    String newMasterSalt = Password.generateRandomSalt();
+                    String newDecryptSalt = Password.generateRandomSalt();
+                    terminal.info("Master password matches! Now please enter a new master password.\n");
+                    String newMasterPassword = getValidPasswordFromUser();
+                    Login.writeToUserFile(terminal, newMasterSalt, new Password(newMasterPassword, newMasterSalt).generateHash(), newDecryptSalt);
+                    this.key = new Password(newMasterPassword, newDecryptSalt).generateHash();
+                    savePasswords();
+                }
+                else
+                {
+                    terminal.error("Entered master password does not match!\n");
+                }
+            }
+            else
+            {
+                terminal.error("Stored master salt and/or hash failed to load.");
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            terminal.error("User text file was not found! Unable to change master password");
+        }
+
     }
 
     private void searchByTitle()

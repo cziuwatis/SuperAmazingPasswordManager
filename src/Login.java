@@ -158,8 +158,12 @@ public class Login {
     }
 
     public void writeToUserFile() {
-        try(FileWriter fileWriter = new FileWriter(FILE_PATH);) {
-            PrintWriter printWriter = new PrintWriter(fileWriter);
+        try(
+                FileWriter fileWriter = new FileWriter(FILE_PATH);
+                PrintWriter printWriter = new PrintWriter(fileWriter);
+                ) 
+        {
+            
             printWriter.println(this.masterSalt);
             printWriter.println(this.masterHash);
             printWriter.println(this.decryptSalt);
@@ -167,6 +171,24 @@ public class Login {
         } catch (IOException e) {
             this.terminal.error(ERR_WRITE);
             this.terminal.error(ERR_EXIT);
+            System.exit(1);
+        }
+
+    }
+    
+    public static void writeToUserFile(Terminal terminal, String masterSalt, String masterHash, String decryptSalt) {
+        try(
+                FileWriter fileWriter = new FileWriter(FILE_PATH);
+                PrintWriter printWriter = new PrintWriter(fileWriter);) 
+        {
+            
+            printWriter.println(masterSalt);
+            printWriter.println(masterHash);
+            printWriter.println(decryptSalt);
+            printWriter.close();
+        } catch (IOException e) {
+            terminal.error(ERR_WRITE);
+            terminal.error(ERR_EXIT);
             System.exit(1);
         }
 
