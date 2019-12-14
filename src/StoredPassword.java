@@ -17,7 +17,7 @@ public final class StoredPassword
 {
 
     private static int totalIds = 0;
-    private int id; //Snowflake?
+    private int id;
     private String title;
     private String website;
     private String password;

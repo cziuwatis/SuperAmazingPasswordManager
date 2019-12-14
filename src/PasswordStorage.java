@@ -68,15 +68,18 @@ public class PasswordStorage
 //        }
 //        return null;
 //    }
-    public String[] getPasswordDetails(int id)
+    
+    //this method returns a new copy where details can't be edited to the existing one
+    public StoredPassword getPasswordDetails(int id)
     {
         StoredPassword userPassword = findStoredPassword(id);
         if (userPassword != null){
-            return new StoredPassword(userPassword.getId(), userPassword.getTitle(), userPassword.getWebsite());
+            return new StoredPassword(userPassword.getId(), userPassword.getTitle(), userPassword.getWebsite(), userPassword.getPassword());
         }
         return null;
     }
 
+    //this method returns the actual password where details can be edited
     public String getPassword(int id)
     {
         StoredPassword userPassword = findStoredPassword(id);
