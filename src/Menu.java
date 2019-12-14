@@ -136,8 +136,16 @@ public class Menu
             int newPasswordId = passwords.getLatestPasswordId();
             passwords.editPasswordTitle(newPasswordId, terminal.readLine("\nEnter the title for the password >>"));
             passwords.editPasswordWebsite(newPasswordId, terminal.readLine("Enter the website for the password >>"));
-            passwords.editPasswordPassword(newPasswordId, terminal.readPassword("Enter the actual password >>"));
-            terminal.info("\nCongratz mate, ya password is safe with us yarr.\n");
+            String tempPassword = terminal.readPassword("Enter the actual password >>");
+            if (checkPasswordUsage(tempPassword))
+            {
+                passwords.editPasswordPassword(newPasswordId, tempPassword);
+            }
+            else
+            {
+                terminal.info("Password not added.\n");
+            }
+            tempPassword = null;
             displayPasswordDetails(newPasswordId);
             terminal.info("\n");
         }
@@ -194,6 +202,17 @@ public class Menu
                 terminal.error(ERR_CMD);
             }
         }
+    }
+
+    private boolean checkPasswordUsage(String password)
+    {
+
+        if (passwords.isPasswordUsed(password))
+        {
+            terminal.warn("You have previously used this password, are you sure you want use it again?");
+            return Utilities.getYesNoAnswer(terminal, ">>");
+        }
+        return true;
     }
 
     /**
@@ -395,7 +414,15 @@ public class Menu
         {
             try
             {
-                passwords.editPasswordPassword(passwordId, terminal.readLine("Enter new password >>"));
+                String tempPassword = terminal.readLine("Enter new password >>");
+                if (checkPasswordUsage(tempPassword))
+                {
+                    passwords.editPasswordPassword(passwordId, tempPassword);
+                }
+                else
+                {
+                    terminal.info("Password not added.\n");
+                }
             }
             catch (IllegalArgumentException e)
             {

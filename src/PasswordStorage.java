@@ -26,17 +26,6 @@ public class PasswordStorage
         this.userPasswords.add(new StoredPassword(title, website, password));
     }
 
-    public boolean editPasswordProperty(int id, String newPropertyString, PasswordOptions passwordOptions)
-    {
-        StoredPassword userPassword = findStoredPassword(id);
-        if (userPassword != null)
-        {
-            passwordOptions.setProperty(userPassword, newPropertyString);
-            return true;
-        }
-        return false;
-    }
-
     public boolean editPasswordTitle(int id, String newTitle)
     {
         StoredPassword userPassword = findStoredPassword(id);
@@ -82,13 +71,8 @@ public class PasswordStorage
     public String[] getPasswordDetails(int id)
     {
         StoredPassword userPassword = findStoredPassword(id);
-        if (userPassword != null)
-        {
-            String[] details = new String[3];
-            details[0] = userPassword.getTitle();
-            details[1] = userPassword.getWebsite();
-            details[2] = userPassword.getLastUpdated().toString();
-            return details;
+        if (userPassword != null){
+            return new StoredPassword(userPassword.getId(), userPassword.getTitle(), userPassword.getWebsite());
         }
         return null;
     }
@@ -164,5 +148,17 @@ public class PasswordStorage
             }
         }
         return null;
+    }
+
+    public boolean isPasswordUsed(String password)
+    {
+        for (StoredPassword userPassword : this.userPasswords)
+        {
+            if (userPassword.getPassword().equals(password))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
