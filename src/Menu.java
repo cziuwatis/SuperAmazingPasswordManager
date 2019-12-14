@@ -183,7 +183,7 @@ public class Menu
                 StoredPassword.validatePassword(password);
                 isValid = true;
             }
-            catch (IllegalArgumentException e)
+            catch (PasswordException e)
             {
                 terminal.error(e.getMessage() + " (Please try again)\n");
             }
@@ -321,6 +321,7 @@ public class Menu
                     Login.writeToUserFile(terminal, newMasterSalt, new Password(newMasterPassword, newMasterSalt).generateHash(), newDecryptSalt);
                     this.key = new Password(newMasterPassword, newDecryptSalt).generateHash();
                     savePasswords();
+                    terminal.info("Master password successfully changed!");
                 }
                 else
                 {
