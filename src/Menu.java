@@ -53,7 +53,7 @@ public class Menu
      * Main method, starts event loop of Menu. Blocks until exit command is
      * entered.
      */
-    public void run()
+    public void run(String key)
     {
         this.running = true;
         while (this.running)
