@@ -30,22 +30,27 @@ public final class StoredPassword
             return false;
         }
         String hasNumber = "[0-9]+";
-        if(!Utilities.matchesRegex(password, hasNumber)) {
+        if (!Utilities.matchesRegex(password, hasNumber))
+        {
             return false;
         }
         String hasLower = "[a-z]+";
-        if(!Utilities.matchesRegex(password, hasLower)) {
+        if (!Utilities.matchesRegex(password, hasLower))
+        {
             return false;
         }
         String hasUpper = "[A-Z]+";
-        if(!Utilities.matchesRegex(password, hasUpper)) {
+        if (!Utilities.matchesRegex(password, hasUpper))
+        {
             return false;
         }
         String hasSymbol = "[^a-zA-z0-9]+";
-        if(!Utilities.matchesRegex(password, hasSymbol)) {
+        if (!Utilities.matchesRegex(password, hasSymbol))
+        {
             return false;
         }
-        if(Utilities.isCommonPassword(password)) {
+        if (Utilities.isCommonPassword(password))
+        {
             return false;
         }
 
@@ -72,7 +77,7 @@ public final class StoredPassword
         this.setTitle(title);
         this.setWebsite(website);
         this.setPassword(password);
-        this.setLastUpdated(null);
+        this.setLastUpdated();
     }
 
     public StoredPassword(String title, String website, String password)
@@ -81,7 +86,7 @@ public final class StoredPassword
         this.setTitle(title);
         this.setWebsite(website);
         this.setPassword(password);
-        this.setLastUpdated(null);
+        this.setLastUpdated();
     }
 
     public int getId()
@@ -89,7 +94,8 @@ public final class StoredPassword
         return this.id;
     }
 
-    public static void validateId(int id) {
+    public static void validateId(int id)
+    {
         if (id < 1)
         {
             throw new IllegalArgumentException("ID must be greater than 0.");
@@ -112,7 +118,8 @@ public final class StoredPassword
         return this.title;
     }
 
-    public static void validateTitle(String title) {
+    public static void validateTitle(String title)
+    {
         if (title.length() > 255)
         {
             throw new IllegalArgumentException("Title must be smaller than 255 characters.");
@@ -131,7 +138,8 @@ public final class StoredPassword
         return this.website;
     }
 
-    public static void validateWebsite(String website) {
+    public static void validateWebsite(String website)
+    {
         Pattern urlRegex = Pattern.compile("^(https?://)?([a-zA-Z0-9.-]+)(:[0-9]{1,4})?$");
         Matcher matcher = urlRegex.matcher(website);
         if (!matcher.matches())
@@ -157,7 +165,8 @@ public final class StoredPassword
         return this.password;
     }
 
-    public static void validatePassword(String password) {
+    public static void validatePassword(String password)
+    {
         if (password.isEmpty())
         {
             throw new IllegalArgumentException("Password can not be empty.");
@@ -182,7 +191,8 @@ public final class StoredPassword
 
     public void setLastUpdated(LocalDateTime lastUpdated)
     {
-        if(lastUpdated == null) {
+        if (lastUpdated == null)
+        {
             throw new IllegalArgumentException("Last Updated can not be null.");
         }
         this.lastUpdated = lastUpdated;
@@ -191,6 +201,21 @@ public final class StoredPassword
     public void setLastUpdated()
     {
         this.lastUpdated = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString()
+    {
+        return "StoredPassword{" + "id=" + id + ", title=" + title + ", website=" + website + ", password=" + password + ", lastUpdated=" + lastUpdated + '}';
+    }
+
+    public String toCSVLine()
+    {//I can probably make a string and just run the replaceAll once instead of one by one
+        String sanitizedTitle = this.getTitle().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
+        String sanitizedWebsite = this.getWebsite().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
+        String sanitizedPassword = this.getPassword().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
+        String sanitizedLastUpdated = this.getLastUpdated().toString().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
+        return this.getId() + "," + sanitizedTitle + "," + sanitizedWebsite + "," + sanitizedPassword + "," + sanitizedLastUpdated;
     }
 
 }

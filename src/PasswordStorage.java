@@ -1,6 +1,14 @@
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  *
@@ -68,12 +76,12 @@ public class PasswordStorage
 //        }
 //        return null;
 //    }
-    
     //this method returns a new copy where details can't be edited to the existing one
     public StoredPassword getPasswordDetails(int id)
     {
         StoredPassword userPassword = findStoredPassword(id);
-        if (userPassword != null){
+        if (userPassword != null)
+        {
             return new StoredPassword(userPassword.getId(), userPassword.getTitle(), userPassword.getWebsite(), userPassword.getPassword());
         }
         return null;
@@ -164,4 +172,145 @@ public class PasswordStorage
         }
         return false;
     }
+
+    public boolean readPasswordsOut(String filePath, String key)
+    {
+        String allStoredPasswords = "";
+        for (StoredPassword userPassword : this.userPasswords)
+        {
+            allStoredPasswords += userPassword.toCSVLine() + "\n";
+        }
+        allStoredPasswords = Cipher.encryptString(allStoredPasswords, key);
+        try (FileWriter fileInput = new FileWriter(new File(filePath)))
+        {
+            fileInput.write(allStoredPasswords);
+            fileInput.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.getMessage());//@TODO use terminal
+            return false;
+        }
+        return true;
+    }
+
+    public boolean readPasswordsIn(String filePath, String key)
+    {
+
+        try (Scanner source = new Scanner(Cipher.decryptString((new Scanner(new FileReader(filePath))).nextLine(), key)))//this ok? :D :D
+        {
+            source.useDelimiter("[,\n]");
+            int passwordId;
+            String title, website, password;
+            LocalDateTime lastUpdated;
+            while (source.hasNextLine() && source.hasNext())
+            {
+                try
+                {
+                    passwordId = source.nextInt();
+                    title = source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r");
+                    website = source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r");
+                    password = source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r");
+                    lastUpdated = LocalDateTime.parse(source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r"));
+                    this.userPasswords.add(new StoredPassword(passwordId, title, website, password, lastUpdated));
+                }
+                catch (NoSuchElementException | DateTimeParseException e)
+                {
+                    //@TODO do we want to send a message here?
+                    System.out.println(e.getMessage());
+                    if (source.hasNextLine())
+                    {
+                        source.nextLine();
+                    }
+                }
+                catch (IllegalArgumentException e)
+                {
+                    //@TODO do we want to send a message that it's too weak or just keep it hidden?
+                    System.out.println(e.getMessage());
+                    if (source.hasNextLine())
+                    {
+                        source.nextLine();
+                    }
+                }
+            }
+        }//@TODO add catch for no line found
+        catch (FileNotFoundException | NoSuchElementException | IllegalArgumentException | CipherException e)
+        {
+            //cipher exception for any exceptions in cipher that may occur
+            //nosuchelementexception for the .nextLine() in try with resources
+            //illegalargumentexception is for the base64 encoding
+            System.out.println(e.getMessage());//@TODO remove sout
+            return false;
+        }
+        return true;
+    }
+
+    //@TODO remove debug
+    //debug purposes
+//    public boolean readPasswordsOut2(String filePath, String key)
+//    {
+//        String allStoredPasswords = "";
+//        for (StoredPassword userPassword : this.userPasswords)
+//        {
+//            allStoredPasswords += userPassword.toCSVLine() + "\n";
+//        }
+////        allStoredPasswords = Cipher.encryptString(allStoredPasswords, key);
+//        try (FileWriter fileInput = new FileWriter(new File(filePath)))
+//        {
+//            fileInput.write(allStoredPasswords);
+//            fileInput.close();
+//        }
+//        catch (IOException e)
+//        {
+//            System.out.println(e.getMessage());//@TODO use terminal
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    public boolean readPasswordsIn2(String filePath, String key)
+//    {
+//
+//        try (Scanner source = new Scanner(new FileReader(filePath)))
+//        {
+//            source.useDelimiter("[,\n]");
+//            int passwordId;
+//            String title, website, password;
+//            LocalDateTime lastUpdated;
+//            while (source.hasNextLine() && source.hasNext())
+//            {
+//                try
+//                {
+//                    passwordId = source.nextInt();
+//                    title = source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r");
+//                    website = source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r");
+//                    password = source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r");
+//                    lastUpdated = LocalDateTime.parse(source.next().replaceAll("&#44;", ",").replaceAll("&#10;", "\n").replaceAll("&#13;", "\r"));
+//                    this.userPasswords.add(new StoredPassword(passwordId, title, website, password, lastUpdated));
+//                }
+//                catch (NoSuchElementException | DateTimeParseException e)
+//                {
+//                    System.out.println(e.getMessage());
+//                    if (source.hasNextLine())
+//                    {
+//                        source.nextLine();
+//                    }
+//                }
+//                catch (IllegalArgumentException e)
+//                {
+//                    //@TODO do we want to send a message that it's too weak or just keep it hidden?
+//                    if (source.hasNextLine())
+//                    {
+//                        source.nextLine();
+//                    }
+//                }
+//            }
+//        }//@TODO add catch for no line found
+//        catch (FileNotFoundException e)
+//        {
+//            System.out.println(e.getMessage());//@TODO use terminal
+//            return false;
+//        }
+//        return true;
+//    }
 }

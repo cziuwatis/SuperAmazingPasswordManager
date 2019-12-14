@@ -30,6 +30,7 @@ public class Menu
     private static final String EDIT_PASSWORDS_MENU_OPTIONS = " 1. Edit password title\n 2. Edit password website\n 3. Edit password password\n B. Back";
     private static final String VIEW_PASSWORDS_MENU_OPTIONS = " 1. View all entries\n 2. Search by title\n 3. Search by website\n B. Back";
     private static final String DEFAULT_BORDER = "-";
+    private static final String DEFAULT_USER_PASSWORDS_PATH = "passwordStore.txt";
     private static final int DEFAULT_BORDER_LENGTH = 90;
 
     /*
@@ -38,6 +39,7 @@ public class Menu
     private boolean running;
     private PasswordStorage passwords;
     private final Terminal terminal;
+    private String key;
 
     /**
      * Constructor for Menu class.
@@ -46,16 +48,21 @@ public class Menu
     {
         this.running = false;
         this.terminal = new Terminal();
-        this.passwords = new PasswordStorage(); //@TODO read in passwords
+        this.passwords = new PasswordStorage();
+        this.key = ""; //key used to decrypt/encrypt password files
     }
 
     /**
      * Main method, starts event loop of Menu. Blocks until exit command is
      * entered.
+     *
+     * @param key key to be used for decryption/encryption of passwords
      */
     public void run(String key)
     {
         this.running = true;
+        this.key = key;
+        loadPasswords();
         while (this.running)
         {
             Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, MAIN_MENU_OPTIONS, "MAIN MENU");
@@ -118,6 +125,7 @@ public class Menu
      */
     private void exit()
     {
+        savePasswords();
         terminal.info("Goodbye!");
         this.running = false;
     }
@@ -190,27 +198,22 @@ public class Menu
         Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
         terminal.info("\nAdding a new password\n");
         Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
-        try
+        terminal.info("\n");
+        String passwordTitle = getValidTitleFromUser();
+        String passwordWebsite = getValidWebsiteFromUser();
+        String password = getValidPasswordFromUser();
+        if (checkPasswordUsage(password))
         {
-            String passwordTitle = getValidTitleFromUser();
-            String passwordWebsite = getValidWebsiteFromUser();
-            String password = getValidPasswordFromUser();
-            if (checkPasswordUsage(password))
-            {
-                passwords.addNewPassword(passwordTitle, passwordWebsite, password);
-            }
-            else
-            {
-                terminal.info("Password not added.\n");
-            }
-            password = null;
-            displayPasswordDetails(passwords.getLatestPasswordId());
-            terminal.info("\n");
+            passwords.addNewPassword(passwordTitle, passwordWebsite, password);
+            savePasswords();
         }
-        catch (IllegalArgumentException e)
+        else
         {
-            terminal.error(e.getMessage());
+            terminal.info("Password not added.\n");
         }
+        password = null;
+        displayPasswordDetails(passwords.getLatestPasswordId());
+        terminal.info("\n");
     }
 
     /**
@@ -283,6 +286,7 @@ public class Menu
         {
             if (passwords.removePassword(passwordId))
             {
+                savePasswords();
                 terminal.info("Password entry has been removed\n");
             }
             //fail shouldn't be possible since confirming password found it above.
@@ -434,15 +438,8 @@ public class Menu
         terminal.info("You are about to edit this entry:\n");
         if (confirmPassword(passwordId))
         {
-            //edit title
-            try
-            {
-                passwords.editPasswordTitle(passwordId, terminal.readLine("Enter new title >>"));
-            }
-            catch (IllegalArgumentException e)
-            {
-                terminal.error(e.getMessage());
-            }
+            passwords.editPasswordTitle(passwordId, getValidTitleFromUser());
+            savePasswords();
         }
     }
 
@@ -452,14 +449,8 @@ public class Menu
         terminal.info("You are about to edit this entry:\n");
         if (confirmPassword(passwordId))
         {
-            try
-            {
-                passwords.editPasswordWebsite(passwordId, terminal.readLine("Enter new website >>"));
-            }
-            catch (IllegalArgumentException e)
-            {
-                terminal.error(e.getMessage());
-            }
+            passwords.editPasswordWebsite(passwordId, getValidWebsiteFromUser());
+            savePasswords();
         }
     }
 
@@ -469,50 +460,27 @@ public class Menu
         terminal.info("You are about to edit this entry:\n");
         if (confirmPassword(passwordId))
         {
-            try
+            String tempPassword = getValidPasswordFromUser();
+            if (checkPasswordUsage(tempPassword))
             {
-                String tempPassword = terminal.readLine("Enter new password >>");
-                if (checkPasswordUsage(tempPassword))
-                {
-                    passwords.editPasswordPassword(passwordId, tempPassword);
-                }
-                else
-                {
-                    terminal.info("Password not added.\n");
-                }
+                passwords.editPasswordPassword(passwordId, tempPassword);
+                savePasswords();
             }
-            catch (IllegalArgumentException e)
+            else
             {
-                terminal.error(e.getMessage());
+                terminal.info("Password not added.\n");
             }
         }
     }
 
-    /**
-     * Reads in lines from a Scanner stream, returning them as a String[]
-     * object. Designed for reading text files.
-     *
-     * @param input Scanner input to read from
-     * @return String[] of lines from scanner.
-     */
-    private String[] readLines(Scanner input)
+    private void savePasswords()
     {
-        int count = 0;
-        String fullRead = "";
-        while (input.hasNextLine())
-        {
-            fullRead += input.nextLine() + "\n";
-            count++;
-        }
-        String[] out = new String[count];
-        input.close();
-        input = null;
-        input = new Scanner(fullRead);
-        for (int i = 0; i < count; i++)
-        {
-            out[i] = input.nextLine();
-        }
-        return out;
+        passwords.readPasswordsOut(DEFAULT_USER_PASSWORDS_PATH, this.key);
+    }
+
+    private void loadPasswords()
+    {
+        passwords.readPasswordsIn(DEFAULT_USER_PASSWORDS_PATH, this.key);
     }
 
 }
