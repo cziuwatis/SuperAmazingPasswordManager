@@ -122,6 +122,66 @@ public class Menu
         this.running = false;
     }
 
+    public String getValidTitleFromUser()
+    {
+        String title = "";
+        boolean isValid = false;
+        while (!isValid)
+        {
+            try
+            {
+                title = terminal.readLine("Enter title >> ");
+                StoredPassword.validateTitle(title);
+                isValid = true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                terminal.error(e.getMessage() + " (Please try again)\n");
+            }
+        }
+        return title;
+    }
+
+    public String getValidWebsiteFromUser()
+    {
+        String website = "";
+        boolean isValid = false;
+        while (!isValid)
+        {
+            try
+            {
+                website = terminal.readLine("Enter website >> ");
+                StoredPassword.validateWebsite(website);
+                isValid = true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                terminal.error(e.getMessage() + " (Please try again)\n");
+            }
+        }
+        return website;
+    }
+
+    public String getValidPasswordFromUser()
+    {
+        String password = "";
+        boolean isValid = false;
+        while (!isValid)
+        {
+            try
+            {
+                password = terminal.readLine("Enter password >> ");
+                StoredPassword.validatePassword(password);
+                isValid = true;
+            }
+            catch (IllegalArgumentException e)
+            {
+                terminal.error(e.getMessage() + " (Please try again)\n");
+            }
+        }
+        return password;
+    }
+
     /**
      * Adding a new password option.
      */
@@ -132,27 +192,24 @@ public class Menu
         Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
         try
         {
-            passwords.addNewPassword("Unset", "Unset", "!2345678testpassword");
-            int newPasswordId = passwords.getLatestPasswordId();
-            passwords.editPasswordTitle(newPasswordId, terminal.readLine("\nEnter the title for the password >>"));
-            passwords.editPasswordWebsite(newPasswordId, terminal.readLine("Enter the website for the password >>"));
-            String tempPassword = terminal.readPassword("Enter the actual password >>");
-            if (checkPasswordUsage(tempPassword))
+            String passwordTitle = getValidTitleFromUser();
+            String passwordWebsite = getValidWebsiteFromUser();
+            String password = getValidPasswordFromUser();
+            if (checkPasswordUsage(password))
             {
-                passwords.editPasswordPassword(newPasswordId, tempPassword);
+                passwords.addNewPassword(passwordTitle, passwordWebsite, password);
             }
             else
             {
                 terminal.info("Password not added.\n");
             }
-            tempPassword = null;
-            displayPasswordDetails(newPasswordId);
+            password = null;
+            displayPasswordDetails(passwords.getLatestPasswordId());
             terminal.info("\n");
         }
         catch (IllegalArgumentException e)
         {
             terminal.error(e.getMessage());
-            passwords.removeLatestPassword(); //remove latest added password
         }
     }
 
@@ -359,12 +416,12 @@ public class Menu
 
     private boolean displayPasswordDetails(int passwordId)
     {
-        String[] passwordDetails = passwords.getPasswordDetails(passwordId);
+        StoredPassword passwordDetails = passwords.getPasswordDetails(passwordId);
         if (passwordDetails != null)
         {
-            terminal.info("Title        : " + passwordDetails[0]
-                    + "\nWebsite      : " + passwordDetails[1]
-                    + "\nLast updated : " + passwordDetails[2]
+            terminal.info("Title        : " + passwordDetails.getTitle()
+                    + "\nWebsite      : " + passwordDetails.getWebsite()
+                    + "\nLast updated : " + passwordDetails.getLastUpdated()
                     + "\n");
             return true;
         }
