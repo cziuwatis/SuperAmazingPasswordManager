@@ -1,6 +1,10 @@
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -8,6 +12,8 @@ import java.util.Scanner;
  */
 public class Utilities
 {
+
+    public static final String COMMON_PASSWORDS_PATH = "common.txt";
 
     /**
      * Prints available menu options with a menu title bordered by the specified
@@ -143,5 +149,38 @@ public class Utilities
             return s;
         }
         return s.substring(0, cuttingPoint) + appendedString;
+    }
+
+    /**
+     * Tests whether a given string matches a regex.
+     * @param str String to be tested
+     * @param regex Regex pattern to test against
+     * @return whether the given string matches the pattern
+     */
+    public static boolean matchesRegex(String str, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
+    }
+
+    /**
+     * Checks password against a list of common passwords
+     * @param password Password to check
+     * @return whether the password turns up on a list of common passwords
+     */
+    public static boolean isCommonPassword(String password) {
+        File fileObj = new File(COMMON_PASSWORDS_PATH);
+        try(Scanner scanner = new Scanner(fileObj)) {
+            while(scanner.hasNextLine()) {
+                String common = scanner.nextLine();
+                if(password.equalsIgnoreCase(common)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (FileNotFoundException e) {
+            // Cant find password list
+            return false;
+        }
     }
 }

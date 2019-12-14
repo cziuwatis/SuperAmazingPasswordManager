@@ -79,7 +79,7 @@ public class Login {
     }
 
     public void loginWait() {
-        int waitSeconds = calcWaitSeconds();
+        long waitSeconds = calcWaitSeconds();
         terminal.warn(String.format(INCORRECT_PASSWORD, waitSeconds));
         long nextAttempt = this.lastAttempt + waitSeconds;
         while(unixTime() < nextAttempt) {
@@ -88,8 +88,8 @@ public class Login {
         return;
     }
 
-    public int calcWaitSeconds() {
-        return (int) Math.pow(2, this.numAttempts - 1);
+    public long calcWaitSeconds() {
+        return this.numAttempts > 0 ? (long) Math.pow(2, this.numAttempts - 1) : 0;
     }
 
 

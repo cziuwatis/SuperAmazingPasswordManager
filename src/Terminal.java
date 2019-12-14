@@ -1,6 +1,6 @@
-import java.io.Console;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -14,11 +14,9 @@ import java.util.Scanner;
  */
 public class Terminal {
 
-    private Scanner inputScanner;
-    private PrintWriter outputWriter;
-    private PrintWriter errorWriter;
-    private Console console;
-    private boolean supportsAnsi;
+    public static final String SETTINGS_FILE_PATH = "saps.properties";
+    public static final String WARN_NO_CONFIG_FILE = "No settings file found.\n";
+
     public static final String COLOR_GRAY = "\u001B[38;5;8m";
     public static final String COLOR_RED = "\u001B[38;5;9m";
     public static final String COLOR_GREEN = "\u001B[38;5;10m";
@@ -43,7 +41,15 @@ public class Terminal {
                 COLOR_MAGENTA + "M" + COLOR_CYAN + "C" + COLOR_WHITE + "W" + COLOR_RESET;
     }
 
+    private Scanner inputScanner;
+    private PrintWriter outputWriter;
+    private PrintWriter errorWriter;
+    private Console console;
+    private boolean supportsAnsi;
+    private Properties settings;
+
     public Terminal() {
+        // Set up input/output streams
         this.console = System.console();
         if (this.console != null) {
             this.inputScanner = new Scanner(this.console.reader());
@@ -55,21 +61,85 @@ public class Terminal {
             // this.errorWriter = new PrintWriter(System.err, true); // Not always in sync with System.out, looks odd.
             this.errorWriter = new PrintWriter(System.out, true);
         }
+
+        this.settings = new Properties();
+
+        this.readSettingsFile();
+
+        this.writeSettingsFile();
+
+    }
+
+    private void readSettingsFile() {
+        // Read .ini file
+        try(FileInputStream fileIn = new FileInputStream(SETTINGS_FILE_PATH);) {
+            this.settings.load(fileIn);
+            String color = settings.getProperty("enableColor", null);
+            if(color == null) {
+                boolean check = this.detectColor();
+                if(check) {
+                    this.supportsAnsi = true;
+                    this.settings.setProperty("enableColor", "true");
+                } else {
+                    this.supportsAnsi = false;
+                    this.settings.setProperty("enableColor", "false");
+                }
+            } else if(color.equalsIgnoreCase("true")) {
+                this.supportsAnsi = true;
+            } else if(color.equalsIgnoreCase("false")) {
+                this.supportsAnsi = false;
+            } else {
+                // Invalid option
+                boolean check = this.detectColor();
+                if(check) {
+                    this.supportsAnsi = true;
+                    this.settings.setProperty("enableColor", "true");
+                } else {
+                    this.supportsAnsi = false;
+                    this.settings.setProperty("enableColor", "false");
+                }
+            }
+        } catch (FileNotFoundException e) {
+            // Settings file not found
+            this.warn(WARN_NO_CONFIG_FILE);
+            boolean check = this.detectColor();
+            if(check) {
+                this.supportsAnsi = true;
+                this.settings.setProperty("enableColor", "true");
+            } else {
+                this.supportsAnsi = false;
+                this.settings.setProperty("enableColor", "false");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeSettingsFile() {
+        try (OutputStream output = new FileOutputStream(SETTINGS_FILE_PATH)) {
+            this.settings.store(output, null);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public boolean detectColor() {
+        // Try to auto detect ANSI color support
         String termType = System.getenv().get("TERM");
         if(termType != null) {
             ArrayList<String> colorTerms = getColorTerms();
             if(colorTerms.contains(termType)) {
-                this.supportsAnsi = true;
+                return this.supportsAnsi = true;
             } else {
-                this.askColor();
+                return this.askColor();
             }
         } else {
-            this.askColor();
+            return this.askColor();
         }
-
     }
 
-    private void askColor() {
+    private boolean askColor() {
+
         this.outputWriter.println("\t[!] Warning! Could not detect whether color is supported by this terminal.");
         this.outputWriter.printf("\t[!] Try use color anyway? (Color Sample: [%s]\n", sampleColors());
         this.outputWriter.print("Yes / No >> ");
@@ -78,16 +148,17 @@ public class Terminal {
             String ans = this.inputScanner.nextLine();
             if("yes".equalsIgnoreCase(ans)) {
                 this.supportsAnsi = true;
-                break;
+                return true;
             } else if("no".equalsIgnoreCase(ans)) {
                 this.supportsAnsi = false;
-                break;
+                return false;
             } else {
                 this.outputWriter.println("\t[!] Invalid option.");
                 this.outputWriter.println("\t[!] Try use color anyway?");
                 this.outputWriter.print("Yes / No >> ");
             }
         }
+        return false;
     }
 
     public Scanner getInputScanner() {
