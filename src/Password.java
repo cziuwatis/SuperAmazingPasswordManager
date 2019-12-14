@@ -102,10 +102,9 @@ public class Password {
    * @param password A plaintext password.
    */
   public void setPassword(String password) {
-    if(!StoredPassword.checkPasswordStrength(password)) {
-      throw new IllegalArgumentException("Password too weak.");
+    if(StoredPassword.checkPasswordStrength(password)) {
+      this.password = password;
     }
-    this.password = password;
   }
 
   /**

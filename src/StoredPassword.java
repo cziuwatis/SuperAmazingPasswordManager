@@ -27,26 +27,26 @@ public final class StoredPassword
     {
         if (password.length() < 8)
         {
-            return false;
+            throw new PasswordException("Password must be at least 8 characters.");
         }
         String hasNumber = "[0-9]+";
         if(!Utilities.matchesRegex(password, hasNumber)) {
-            return false;
+            throw new PasswordException("Password must have at least one number.");
         }
         String hasLower = "[a-z]+";
         if(!Utilities.matchesRegex(password, hasLower)) {
-            return false;
+            throw new PasswordException("Password must have at least one lowercase letter.");
         }
         String hasUpper = "[A-Z]+";
         if(!Utilities.matchesRegex(password, hasUpper)) {
-            return false;
+            throw new PasswordException("Password must have at least one uppercase letter.");
         }
         String hasSymbol = "[^a-zA-z0-9]+";
         if(!Utilities.matchesRegex(password, hasSymbol)) {
-            return false;
+            throw new PasswordException("Password must have at least one symbol.");
         }
         if(Utilities.isCommonPassword(password)) {
-            return false;
+            throw new PasswordException("Password must not match a common password.");
         }
 
         return true;
@@ -162,10 +162,7 @@ public final class StoredPassword
         {
             throw new IllegalArgumentException("Password can not be empty.");
         }
-        if (!checkPasswordStrength(password))
-        {
-            throw new IllegalArgumentException("Password too weak.");
-        }
+        checkPasswordStrength(password); // Throws PasswordException on fail
     }
 
     public void setPassword(String password)
