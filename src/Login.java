@@ -19,6 +19,9 @@ public class Login {
     public static final String WARN_WEAK_PASSWORD = "Your password does not meet minimum requirements! Please use a stronger password.\n";
     public static final String ERR_EXIT = "Exiting...";
     public static final String ERR_WRITE = "Could not write to user file!\n";
+    public static final String ERR_NO_MASTER_PASSWORD = "No master password!\n";
+    public static final String WARN_COMMON_FILE_MISSING = "Could not check against list of common passwords. Continue anyway?\n";
+    public static final String ERR_COMMON_FILE_MISSING = "Could not check against list of common passwords.\n";
     public static final String INCORRECT_PASSWORD = "Invalid password! Try again in %d seconds\n";
     public static final String FILE_PATH = "user.txt";
 
@@ -127,10 +130,26 @@ public class Login {
         this.terminal.info("\t- Minimum 8 characters\n\t- At least one uppercase letter\n" +
                 "\t- At least one lowercase letter\n\t- At least one number\n\t- At least one symbol\n" +
                 "\t- Not a commonly used password (123456, P@ssw0rd, etc.)\n");
-        String masterPassword = terminal.readPassword(LOGIN_PROMPT);
-        while(!StoredPassword.checkPasswordStrength(masterPassword)) {
-            this.terminal.warn(WARN_WEAK_PASSWORD);
+        boolean needPassword = true;
+        String masterPassword = null;
+        while(needPassword) {
             masterPassword = terminal.readPassword(LOGIN_PROMPT);
+            try {
+                StoredPassword.checkPasswordStrength(masterPassword);
+                needPassword = false;
+            } catch (PasswordException e) {
+                this.terminal.warn(WARN_WEAK_PASSWORD);
+                this.terminal.warn(e.getMessage() + "\n");
+            } catch (RuntimeException e) { // FileNotFoundException
+                this.terminal.error(ERR_COMMON_FILE_MISSING);
+                this.terminal.error(ERR_EXIT);
+                System.exit(1);
+            }
+        }
+        if(masterPassword == null) {
+            this.terminal.error(ERR_NO_MASTER_PASSWORD);
+            this.terminal.error(ERR_EXIT);
+            System.exit(1);
         }
         Password pass = new Password(masterPassword, this.masterSalt);
         this.masterHash = pass.generateHash();
