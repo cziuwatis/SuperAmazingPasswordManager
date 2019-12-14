@@ -102,9 +102,16 @@ public class Password {
    * @param password A plaintext password.
    */
   public void setPassword(String password) {
-    if(StoredPassword.checkPasswordStrength(password)) {
-      this.password = password;
+    try {
+      if(StoredPassword.checkPasswordStrength(password)) {
+        this.password = password;
+      } else {
+        throw new IllegalArgumentException("Invalid Password.");
+      }
+    } catch (RuntimeException e) { // FileNotFoundException
+      throw new IllegalArgumentException("Invalid Password.");
     }
+
   }
 
   /**

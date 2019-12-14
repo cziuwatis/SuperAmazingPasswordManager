@@ -20,6 +20,8 @@ public class Login {
     public static final String ERR_EXIT = "Exiting...";
     public static final String ERR_WRITE = "Could not write to user file!\n";
     public static final String ERR_NO_MASTER_PASSWORD = "No master password!\n";
+    public static final String WARN_COMMON_FILE_MISSING = "Could not check against list of common passwords. Continue anyway?\n";
+    public static final String ERR_COMMON_FILE_MISSING = "Could not check against list of common passwords.\n";
     public static final String INCORRECT_PASSWORD = "Invalid password! Try again in %d seconds\n";
     public static final String FILE_PATH = "user.txt";
 
@@ -138,6 +140,10 @@ public class Login {
             } catch (PasswordException e) {
                 this.terminal.warn(WARN_WEAK_PASSWORD);
                 this.terminal.warn(e.getMessage() + "\n");
+            } catch (RuntimeException e) { // FileNotFoundException
+                this.terminal.error(ERR_COMMON_FILE_MISSING);
+                this.terminal.error(ERR_EXIT);
+                System.exit(1);
             }
         }
         if(masterPassword == null) {
