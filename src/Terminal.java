@@ -72,7 +72,7 @@ public class Terminal {
 
     private void readSettingsFile() {
         // Read .ini file
-        try(FileInputStream fileIn = new FileInputStream(SETTINGS_FILE_PATH);) {
+        try(FileInputStream fileIn = new FileInputStream(SETTINGS_FILE_PATH)) {
             this.settings.load(fileIn);
             String color = settings.getProperty("enableColor", null);
             if(color == null) {
@@ -175,7 +175,7 @@ public class Terminal {
 
     public String readPassword() {
         if(this.console != null) {
-            return this.console.readPassword().toString();
+            return this.console.readPassword().toString(); //TODO ???
         } else {
             return this.inputScanner.nextLine();
         }
@@ -211,7 +211,7 @@ public class Terminal {
 
     public void info(String text) {
         if(!this.supportsAnsi) {
-            text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
+            text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
         }
         this.outputWriter.print(text);
         this.outputWriter.flush();
@@ -219,7 +219,7 @@ public class Terminal {
 
     public void warn(String text) {
         if(!this.supportsAnsi) {
-            text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
+            text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
             text = "[Warning] " + text;
         } else {
             text = COLOR_YELLOW + "[Warning] " + text + COLOR_RESET;
@@ -230,7 +230,7 @@ public class Terminal {
 
     public void error(String text) {
         if(!this.supportsAnsi) {
-            text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
+            text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
             text = "[Error] " + text;
         } else {
             text = COLOR_RED + "[Error] " + text + COLOR_RESET;

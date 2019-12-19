@@ -175,20 +175,19 @@ public class PasswordStorage
 
     public boolean readPasswordsOut(String filePath, String key)
     {
-        String allStoredPasswords = "";
+        StringBuilder allStoredPasswords = new StringBuilder();
         for (StoredPassword userPassword : this.userPasswords)
         {
-            allStoredPasswords += userPassword.toCSVLine() + "\n";
+            allStoredPasswords.append(userPassword.toCSVLine()).append("\n");
         }
-        allStoredPasswords = Cipher.encryptString(allStoredPasswords, key);
+        allStoredPasswords = new StringBuilder(Cipher.encryptString(allStoredPasswords.toString(), key));
         try (FileWriter fileInput = new FileWriter(new File(filePath)))
         {
-            fileInput.write(allStoredPasswords);
-            fileInput.close();
+            fileInput.write(allStoredPasswords.toString());
         }
         catch (IOException e)
         {
-            System.out.println(e.getMessage());//@TODO use terminal
+            System.out.println(e.getMessage()); //@TODO use terminal
             return false;
         }
         return true;

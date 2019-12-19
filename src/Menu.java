@@ -224,7 +224,6 @@ public class Menu
         {
             terminal.info("Password not added.\n");
         }
-        password = null;
         terminal.info("\n");
     }
 
@@ -353,7 +352,7 @@ public class Menu
     {
         String oldMasterSalt = null;
         String oldMasterHash = null;
-        try (Scanner inFile = new Scanner(new File(DEFAULT_USER_FILEPATH));)
+        try (Scanner inFile = new Scanner(new File(DEFAULT_USER_FILEPATH)))
         {
             if (inFile.hasNextLine())
             {
@@ -403,7 +402,6 @@ public class Menu
         {
             displayEntries(searchPasswords, false);
         }
-        searchPasswords = null;
     }
 
     private void searchByWebsite()
@@ -414,7 +412,6 @@ public class Menu
         {
             displayEntries(searchPasswords, false);
         }
-        searchPasswords = null;
     }
 
     private void viewAllEntries()
@@ -441,7 +438,6 @@ public class Menu
                 password = entry.getPassword();
             }
             terminal.info(String.format("%-7d | %-20s | %-30s | %s\n", entry.getId(), Utilities.cutAndAppendString(entry.getTitle(), 20 - 2, ".."), Utilities.cutAndAppendString(entry.getWebsite(), 30 - 2, ".."), password));
-            password = null; //to remove from memory?
         }
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");

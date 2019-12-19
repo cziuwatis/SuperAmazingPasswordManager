@@ -28,32 +28,29 @@ public final class StoredPassword
     public static String generateRandomPassword(int length)
     {
         SecureRandom rand = new SecureRandom();
-        String pass = "";
+        StringBuilder pass = new StringBuilder();
         boolean isValidPassword = false;
         while (!isValidPassword)
         {
-            pass = "";
+            pass = new StringBuilder();
             try
             {
                 for (int i = 0; i < length; i++)
                 {
-                    pass += (char) (rand.nextInt(94) + 32);//32 start of ASCII characters, 94 difference between end of ASCI and start
+                    pass.append((char) (rand.nextInt(94) + 32));//32 start of ASCII characters, 94 difference between end of ASCI and start
                 }
-                StoredPassword.validatePassword(pass);
+                StoredPassword.validatePassword(pass.toString());
                 isValidPassword = true;
             }
-            catch (PasswordException e)
-            {
-
-            }
+            catch (PasswordException ignored) {}
         }
-        return pass;
+        return pass.toString();
     }
 
     public static String generateEasyToSayRandomPassword(int length)
     {
         SecureRandom rand = new SecureRandom();
-        String pass = "";
+        StringBuilder pass = new StringBuilder();
         for (int i = 0; i < length; i++)
         {
             char passChar = (char) (rand.nextInt(26) + 65);
@@ -61,19 +58,19 @@ public final class StoredPassword
             {
                 passChar = Character.toLowerCase(passChar);
             }
-            pass += passChar;
+            pass.append(passChar);
         }
-        return pass;
+        return pass.toString();
     }
 
     public static String generateEasyToReadRandomPassword(int length)
     {
         SecureRandom rand = new SecureRandom();
-        String pass = "";
+        StringBuilder pass = new StringBuilder();
         boolean isValidPassword = false;
         while (!isValidPassword)
         {
-            pass = "";
+            pass = new StringBuilder();
             try
             {
                 for (int i = 0; i < length; i++)
@@ -89,18 +86,15 @@ public final class StoredPassword
                     }
                     else
                     {
-                        pass += passChar;
+                        pass.append(passChar);
                     }
                 }
-                StoredPassword.validatePassword(pass);
+                StoredPassword.validatePassword(pass.toString());
                 isValidPassword = true;
             }
-            catch (PasswordException e)
-            {
-
-            }
+            catch (PasswordException ignored) {}
         }
-        return pass;
+        return pass.toString();
     }
 
     public static boolean checkPasswordStrength(String password)
@@ -130,6 +124,7 @@ public final class StoredPassword
                 throw new PasswordException("Password must not match a common password.");
             }
         } catch (FileNotFoundException e) {
+            //TODO throw error if cant find common.txt? or just ignore test?
         }
 
         return true;

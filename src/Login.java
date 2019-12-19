@@ -23,8 +23,6 @@ public class Login
     public static final String WARN_WEAK_PASSWORD = "Your password does not meet minimum requirements! Please use a stronger password.\n";
     public static final String ERR_EXIT = "Exiting...";
     public static final String ERR_WRITE = "Could not write to user file!\n";
-    public static final String ERR_NO_MASTER_PASSWORD = "No master password!\n";
-    public static final String WARN_COMMON_FILE_MISSING = "Could not check against list of common passwords. Continue anyway?\n";
     public static final String ERR_COMMON_FILE_MISSING = "Could not check against list of common passwords.\n";
     public static final String INCORRECT_PASSWORD = "Invalid password! Try again in %d seconds\n";
     public static final String FILE_PATH = "user.txt";
@@ -42,7 +40,7 @@ public class Login
 
     private Terminal terminal;
     private int numAttempts;
-    private long lastAttempt;
+    private long lastAttempt; //TODO remove?
     private String masterHash;
     private String masterSalt;
     private String decryptSalt;
@@ -54,7 +52,7 @@ public class Login
         this.lastAttempt = 0;
         this.masterSalt = null;
         this.masterHash = null;
-        try (Scanner inFile = new Scanner(new File(FILE_PATH));)
+        try (Scanner inFile = new Scanner(new File(FILE_PATH)))
         {
             if (inFile.hasNextLine())
             {
@@ -119,9 +117,9 @@ public class Login
                 String key = pass.generateHash();
                 if (key.equals(this.masterHash))
                 {
+                    loggedIn = true;
                     pass = new Password(masterPassword, this.decryptSalt);
-                    String decyptionKey = pass.generateHash();
-                    return decyptionKey;
+                    return pass.generateHash();
                 }
                 else
                 {
@@ -188,12 +186,6 @@ public class Login
                 System.exit(1);
             }
         }
-        if (masterPassword == null)
-        {
-            this.terminal.error(ERR_NO_MASTER_PASSWORD);
-            this.terminal.error(ERR_EXIT);
-            System.exit(1);
-        }
         Password pass = new Password(masterPassword, this.masterSalt);
         this.masterHash = pass.generateHash();
         this.decryptSalt = Password.generateRandomSalt();
@@ -204,13 +196,12 @@ public class Login
     {
         try (
                 FileWriter fileWriter = new FileWriter(FILE_PATH);
-                PrintWriter printWriter = new PrintWriter(fileWriter);)
+                PrintWriter printWriter = new PrintWriter(fileWriter))
         {
 
             printWriter.println(this.masterSalt);
             printWriter.println(this.masterHash);
             printWriter.println(this.decryptSalt);
-            printWriter.close();
         }
         catch (IOException e)
         {
@@ -225,13 +216,12 @@ public class Login
     {
         try (
                 FileWriter fileWriter = new FileWriter(FILE_PATH);
-                PrintWriter printWriter = new PrintWriter(fileWriter);)
+                PrintWriter printWriter = new PrintWriter(fileWriter))
         {
 
             printWriter.println(masterSalt);
             printWriter.println(masterHash);
             printWriter.println(decryptSalt);
-            printWriter.close();
         }
         catch (IOException e)
         {
