@@ -1,4 +1,5 @@
 
+import java.security.SecureRandom;
 import javax.rmi.CORBA.Util;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
@@ -23,6 +24,84 @@ public final class StoredPassword
     private String password;
     private LocalDateTime lastUpdated;
 
+    public static String generateRandomPassword(int length)
+    {
+        SecureRandom rand = new SecureRandom();
+        String pass = "";
+        boolean isValidPassword = false;
+        while (!isValidPassword)
+        {
+            pass = "";
+            try
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    pass += (char) (rand.nextInt(94) + 32);//32 start of ASCII characters, 94 difference between end of ASCI and start
+                }
+                StoredPassword.validatePassword(pass);
+                isValidPassword = true;
+            }
+            catch (PasswordException e)
+            {
+
+            }
+        }
+        return pass;
+    }
+
+    public static String generateEasyToSayRandomPassword(int length)
+    {
+        SecureRandom rand = new SecureRandom();
+        String pass = "";
+        for (int i = 0; i < length; i++)
+        {
+            char passChar = (char) (rand.nextInt(26) + 65);
+            if (rand.nextInt(100) < 50) //50/50 chance either capital or lowercase
+            {
+                passChar = Character.toLowerCase(passChar);
+            }
+            pass += passChar;
+        }
+        return pass;
+    }
+
+    public static String generateEasyToReadRandomPassword(int length)
+    {
+        SecureRandom rand = new SecureRandom();
+        String pass = "";
+        boolean isValidPassword = false;
+        while (!isValidPassword)
+        {
+            pass = "";
+            try
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    char passChar = (char) (rand.nextInt(94) + 32);
+                    if (passChar == 'i' || passChar == 'L' || passChar == 'I'
+                            || passChar == 'B' || passChar == '8'
+                            || passChar == 'l' || passChar == '1' || passChar == '|'
+                            || passChar == 'o' || passChar == 'O' || passChar == '0'
+                            || passChar == ' ' || passChar == ':' || passChar == ';')
+                    {
+                        i--;
+                    }
+                    else
+                    {
+                        pass += passChar;
+                    }
+                }
+                StoredPassword.validatePassword(pass);
+                isValidPassword = true;
+            }
+            catch (PasswordException e)
+            {
+
+            }
+        }
+        return pass;
+    }
+
     public static boolean checkPasswordStrength(String password)
     {
         if (password.length() < 8)
@@ -30,22 +109,27 @@ public final class StoredPassword
             throw new PasswordException("Password must be at least 8 characters.");
         }
         String hasNumber = "[0-9]+";
-        if(!Utilities.matchesRegex(password, hasNumber)) {
+        if (!Utilities.matchesRegex(password, hasNumber))
+        {
             throw new PasswordException("Password must have at least one number.");
         }
         String hasLower = "[a-z]+";
-        if(!Utilities.matchesRegex(password, hasLower)) {
+        if (!Utilities.matchesRegex(password, hasLower))
+        {
             throw new PasswordException("Password must have at least one lowercase letter.");
         }
         String hasUpper = "[A-Z]+";
-        if(!Utilities.matchesRegex(password, hasUpper)) {
+        if (!Utilities.matchesRegex(password, hasUpper))
+        {
             throw new PasswordException("Password must have at least one uppercase letter.");
         }
         String hasSymbol = "[^a-zA-z0-9]+";
-        if(!Utilities.matchesRegex(password, hasSymbol)) {
+        if (!Utilities.matchesRegex(password, hasSymbol))
+        {
             throw new PasswordException("Password must have at least one symbol.");
         }
-        if(Utilities.isCommonPassword(password)) {
+        if (Utilities.isCommonPassword(password))
+        {
             throw new PasswordException("Password must not match a common password.");
         }
 
