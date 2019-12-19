@@ -11,12 +11,13 @@ import java.util.regex.Pattern;
  * <p>
  * Description here.
  *
- * @author Luke Halpenny
+ * @author Luke Halpenny & Andrej Gorochov
  * @version 1.0
  */
 public final class StoredPassword
 {
 
+    public final static int MIN_PASSWORD_LENGTH = 8;
     private static int totalIds = 0;
     private int id;
     private String title;
@@ -55,7 +56,7 @@ public final class StoredPassword
         String pass = "";
         for (int i = 0; i < length; i++)
         {
-            char passChar = (char) (rand.nextInt(26) + 65);
+            char passChar = (char) (rand.nextInt(26) + 65);//26 for alphabet size, 65 for start of ASCII characters
             if (rand.nextInt(100) < 50) //50/50 chance either capital or lowercase
             {
                 passChar = Character.toLowerCase(passChar);
@@ -77,7 +78,7 @@ public final class StoredPassword
             {
                 for (int i = 0; i < length; i++)
                 {
-                    char passChar = (char) (rand.nextInt(94) + 32);
+                    char passChar = (char) (rand.nextInt(94) + 32);//94 is size of character set, 32 is start of ASCII characters used to generate password
                     if (passChar == 'i' || passChar == 'L' || passChar == 'I'
                             || passChar == 'B' || passChar == '8'
                             || passChar == 'l' || passChar == '1' || passChar == '|'
@@ -104,9 +105,9 @@ public final class StoredPassword
 
     public static boolean checkPasswordStrength(String password)
     {
-        if (password.length() < 8)
+        if (password.length() < MIN_PASSWORD_LENGTH)
         {
-            throw new PasswordException("Password must be at least 8 characters.");
+            throw new PasswordException("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
         }
         String hasNumber = "[0-9]+";
         if (!Utilities.matchesRegex(password, hasNumber))
@@ -197,17 +198,19 @@ public final class StoredPassword
         return this.title;
     }
 
-    public static void validateTitle(String title)
+    public static String validateTitle(String title)
     {
+        title = title.replaceAll("[\n\r]", "").trim();
         if (title.length() > 255)
         {
             throw new IllegalArgumentException("Title must be smaller than 255 characters.");
         }
+        return title;
     }
 
     public void setTitle(String title)
     {
-        validateTitle(title);
+        title = validateTitle(title);
         this.title = title;
         this.setLastUpdated();
     }
@@ -217,8 +220,9 @@ public final class StoredPassword
         return this.website;
     }
 
-    public static void validateWebsite(String website)
+    public static String validateWebsite(String website)
     {
+        website = website.replaceAll("[\n\r]", "").trim();
         Pattern urlRegex = Pattern.compile("^(https?://)?([a-zA-Z0-9.-]+)(:[0-9]{1,4})?$");
         Matcher matcher = urlRegex.matcher(website);
         if (!matcher.matches())
@@ -230,6 +234,11 @@ public final class StoredPassword
         {
             throw new IllegalArgumentException("Invalid URL. Can't have 2 consecutive dots in the hostname");
         }
+        if (hostname.matches(".*\\.$"))
+        {
+            throw new IllegalArgumentException("Invalid URL. Can't have a dot at the end of site hostname");
+        }
+        return website;
     }
 
     public void setWebsite(String website)
@@ -287,6 +296,8 @@ public final class StoredPassword
 
     public String toCSVLine()
     {//I can probably make a string and just run the replaceAll once instead of one by one
+        //though there might be other stuff we want to check for each one so I'll leave it like it is
+        //Another note, even though we are removing \n and \r in our validation
         String sanitizedTitle = this.getTitle().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
         String sanitizedWebsite = this.getWebsite().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
         String sanitizedPassword = this.getPassword().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
