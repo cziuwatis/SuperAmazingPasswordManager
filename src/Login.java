@@ -40,7 +40,6 @@ public class Login
 
     private Terminal terminal;
     private int numAttempts;
-    private long lastAttempt; //TODO remove?
     private String masterHash;
     private String masterSalt;
     private String decryptSalt;
@@ -49,7 +48,6 @@ public class Login
     {
         this.terminal = terminal;
         this.numAttempts = 0;
-        this.lastAttempt = 0;
         this.masterSalt = null;
         this.masterHash = null;
         try (Scanner inFile = new Scanner(new File(FILE_PATH)))
@@ -123,13 +121,11 @@ public class Login
                 }
                 else
                 {
-                    this.lastAttempt = unixTime();
                     this.loginWait();
                 }
             }
             catch (IllegalArgumentException e)
             {
-                this.lastAttempt = unixTime();
                 this.loginWait();
             }
         }

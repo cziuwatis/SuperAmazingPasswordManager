@@ -21,6 +21,7 @@ public class Password {
   // Exception messages
   public static final String ERROR_BAD_ALGORITHM  = "[Hash error] bad algorithm";
   public static final String ERROR_BAD_SPEC       = "[Hash error] bad key specification";
+  public static final String ERR_WEAK_SALT        = "Salt is too small, must be at least 16 bytes.";
 
   // #######################################################
   // # Instance variables
@@ -120,13 +121,14 @@ public class Password {
    * throw an exception (the type of the exception is up
    * to you) if there is an attempt to set an WEAK salt
    *
-   * @TODO Implement validation
-   *    Question 1: Should the salt be of a minimum length
-   *    Question 2: What is that minimum length?
-   *
    * @param salt A password salt value (as a string)
    */
   public void setSalt(String salt) {
+    byte[] saltAsBytes = Base64.getDecoder().decode(salt);
+    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#salting
+    if(saltAsBytes.length < 16) {
+      throw new PasswordException(ERR_WEAK_SALT);
+    }
     this.salt = salt;
   }
 
