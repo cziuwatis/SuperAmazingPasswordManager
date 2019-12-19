@@ -125,8 +125,7 @@ public class Password {
    */
   public void setSalt(String salt) {
     byte[] saltAsBytes = Base64.getDecoder().decode(salt);
-    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#salting
-    if(saltAsBytes.length < 16) {
+    if(saltAsBytes.length < 32) {
       throw new PasswordException(ERR_WEAK_SALT);
     }
     this.salt = salt;
