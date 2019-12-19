@@ -1,6 +1,7 @@
 
 import java.security.SecureRandom;
 import javax.rmi.CORBA.Util;
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,28 +110,26 @@ public final class StoredPassword
             throw new PasswordException("Password must be at least 8 characters.");
         }
         String hasNumber = "[0-9]+";
-        if (!Utilities.matchesRegex(password, hasNumber))
-        {
+        if(!Utilities.matchesRegex(password, hasNumber)) {
             throw new PasswordException("Password must have at least one number.");
         }
         String hasLower = "[a-z]+";
-        if (!Utilities.matchesRegex(password, hasLower))
-        {
+        if(!Utilities.matchesRegex(password, hasLower)) {
             throw new PasswordException("Password must have at least one lowercase letter.");
         }
         String hasUpper = "[A-Z]+";
-        if (!Utilities.matchesRegex(password, hasUpper))
-        {
+        if(!Utilities.matchesRegex(password, hasUpper)) {
             throw new PasswordException("Password must have at least one uppercase letter.");
         }
         String hasSymbol = "[^a-zA-z0-9]+";
-        if (!Utilities.matchesRegex(password, hasSymbol))
-        {
+        if(!Utilities.matchesRegex(password, hasSymbol)) {
             throw new PasswordException("Password must have at least one symbol.");
         }
-        if (Utilities.isCommonPassword(password))
-        {
-            throw new PasswordException("Password must not match a common password.");
+        try {
+            if(Utilities.isCommonPassword(password)) {
+                throw new PasswordException("Password must not match a common password.");
+            }
+        } catch (FileNotFoundException e) {
         }
 
         return true;

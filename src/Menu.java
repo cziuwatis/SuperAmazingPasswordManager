@@ -204,7 +204,7 @@ public class Menu
         String passwordTitle = getValidTitleFromUser();
         String passwordWebsite = getValidWebsiteFromUser();
         String password;
-        if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >>"))
+        if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >> "))
         {
 
             password = generatePasswordMenu();

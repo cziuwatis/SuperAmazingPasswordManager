@@ -168,7 +168,7 @@ public class Utilities
      * @param password Password to check
      * @return whether the password turns up on a list of common passwords
      */
-    public static boolean isCommonPassword(String password) {
+    public static boolean isCommonPassword(String password) throws FileNotFoundException{
         File fileObj = new File(COMMON_PASSWORDS_PATH);
         try(Scanner scanner = new Scanner(fileObj)) {
             while(scanner.hasNextLine()) {
@@ -179,7 +179,7 @@ public class Utilities
             }
             return false;
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("Cannot find common password list"); // FileNotFoundException better but not allowed use throws keyword :c
+            throw new FileNotFoundException("Cannot find common password list");
         }
     }
 }
