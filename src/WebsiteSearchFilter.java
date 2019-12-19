@@ -5,15 +5,12 @@
  */
 
 /**
- *
  * @author andrz
  */
-public class WebsiteSearchFilter implements PasswordSearchFilter
-{
+public class WebsiteSearchFilter implements PasswordSearchFilter {
 
     @Override
-    public String getProperty(Object obj)
-    {
+    public String getProperty(Object obj) {
         return ((StoredPassword) obj).getWebsite();
     }
 }

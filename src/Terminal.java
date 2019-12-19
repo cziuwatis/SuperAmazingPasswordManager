@@ -72,26 +72,26 @@ public class Terminal {
 
     private void readSettingsFile() {
         // Read .ini file
-        try(FileInputStream fileIn = new FileInputStream(SETTINGS_FILE_PATH)) {
+        try (FileInputStream fileIn = new FileInputStream(SETTINGS_FILE_PATH)) {
             this.settings.load(fileIn);
             String color = settings.getProperty("enableColor", null);
-            if(color == null) {
+            if (color == null) {
                 boolean check = this.detectColor();
-                if(check) {
+                if (check) {
                     this.supportsAnsi = true;
                     this.settings.setProperty("enableColor", "true");
                 } else {
                     this.supportsAnsi = false;
                     this.settings.setProperty("enableColor", "false");
                 }
-            } else if(color.equalsIgnoreCase("true")) {
+            } else if (color.equalsIgnoreCase("true")) {
                 this.supportsAnsi = true;
-            } else if(color.equalsIgnoreCase("false")) {
+            } else if (color.equalsIgnoreCase("false")) {
                 this.supportsAnsi = false;
             } else {
                 // Invalid option
                 boolean check = this.detectColor();
-                if(check) {
+                if (check) {
                     this.supportsAnsi = true;
                     this.settings.setProperty("enableColor", "true");
                 } else {
@@ -103,7 +103,7 @@ public class Terminal {
             // Settings file not found
             this.warn(WARN_NO_CONFIG_FILE);
             boolean check = this.detectColor();
-            if(check) {
+            if (check) {
                 this.supportsAnsi = true;
                 this.settings.setProperty("enableColor", "true");
             } else {
@@ -126,9 +126,9 @@ public class Terminal {
     public boolean detectColor() {
         // Try to auto detect ANSI color support
         String termType = System.getenv().get("TERM");
-        if(termType != null) {
+        if (termType != null) {
             ArrayList<String> colorTerms = getColorTerms();
-            if(colorTerms.contains(termType)) {
+            if (colorTerms.contains(termType)) {
                 return this.supportsAnsi = true;
             } else {
                 return this.askColor();
@@ -144,12 +144,12 @@ public class Terminal {
         this.outputWriter.printf("\t[!] Try use color anyway? (Color Sample: [%s]\n", sampleColors());
         this.outputWriter.print("Yes / No >> ");
         this.outputWriter.flush();
-        while(this.inputScanner.hasNextLine()) {
+        while (this.inputScanner.hasNextLine()) {
             String ans = this.inputScanner.nextLine();
-            if("yes".equalsIgnoreCase(ans)) {
+            if ("yes".equalsIgnoreCase(ans)) {
                 this.supportsAnsi = true;
                 return true;
-            } else if("no".equalsIgnoreCase(ans)) {
+            } else if ("no".equalsIgnoreCase(ans)) {
                 this.supportsAnsi = false;
                 return false;
             } else {
@@ -174,7 +174,7 @@ public class Terminal {
     }
 
     public String readPassword() {
-        if(this.console != null) {
+        if (this.console != null) {
             return this.console.readPassword().toString(); //TODO ???
         } else {
             return this.inputScanner.nextLine();
@@ -184,7 +184,7 @@ public class Terminal {
     public String readPassword(String prompt) {
         this.outputWriter.print(prompt);
         this.outputWriter.flush();
-        if(this.console != null) {
+        if (this.console != null) {
             return new String(this.console.readPassword());
         } else {
             return this.inputScanner.nextLine();
@@ -192,7 +192,7 @@ public class Terminal {
     }
 
     public String readLine() {
-        if(this.console != null) {
+        if (this.console != null) {
             return this.console.readLine();
         } else {
             return this.inputScanner.nextLine();
@@ -202,7 +202,7 @@ public class Terminal {
     public String readLine(String prompt) {
         this.outputWriter.print(prompt);
         this.outputWriter.flush();
-        if(this.console != null) {
+        if (this.console != null) {
             return this.console.readLine();
         } else {
             return this.inputScanner.nextLine();
@@ -210,7 +210,7 @@ public class Terminal {
     }
 
     public void info(String text) {
-        if(!this.supportsAnsi) {
+        if (!this.supportsAnsi) {
             text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
         }
         this.outputWriter.print(text);
@@ -218,7 +218,7 @@ public class Terminal {
     }
 
     public void warn(String text) {
-        if(!this.supportsAnsi) {
+        if (!this.supportsAnsi) {
             text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
             text = "[Warning] " + text;
         } else {
@@ -229,7 +229,7 @@ public class Terminal {
     }
 
     public void error(String text) {
-        if(!this.supportsAnsi) {
+        if (!this.supportsAnsi) {
             text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
             text = "[Error] " + text;
         } else {

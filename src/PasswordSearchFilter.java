@@ -1,8 +1,6 @@
 /**
- *
  * @author
  */
-public interface PasswordSearchFilter
-{
+public interface PasswordSearchFilter {
     String getProperty(Object obj);
 }

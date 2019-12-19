@@ -20,7 +20,7 @@ public class Application {
 
     public void run() {
         String key = login.login();
-        if(key == null) {
+        if (key == null) {
             terminal.error("Couldn't log in!\n");
             terminal.error("Exiting...");
             System.exit(1);

@@ -1,12 +1,9 @@
 /**
- *
  * @author
  */
-public class TitleSearchFilter implements PasswordSearchFilter
-{
+public class TitleSearchFilter implements PasswordSearchFilter {
     @Override
-    public String getProperty(Object obj)
-    {
+    public String getProperty(Object obj) {
         return ((StoredPassword) obj).getTitle();
     }
 }
