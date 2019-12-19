@@ -11,7 +11,7 @@ import java.util.Scanner;
  * <p>
  * Handles all menu functions.</p>
  *
- * @author Luke Halpenny
+ * @author Luke Halpenny & Andrej Gorochov
  * @version 1.0
  */
 public class Menu
@@ -33,7 +33,7 @@ public class Menu
     private static final String DEFAULT_BORDER = "-";
     private static final String DEFAULT_USER_PASSWORDS_PATH = "passwordStore.txt";
     private static final String DEFAULT_USER_FILEPATH = "user.txt";
-    private static final int DEFAULT_BORDER_LENGTH = 90;
+    private static final int DEFAULT_BORDER_LENGTH = 130;
 
     /*
      *  FIELDS
@@ -141,7 +141,7 @@ public class Menu
             try
             {
                 title = terminal.readLine("Enter title >> ");
-                StoredPassword.validateTitle(title);
+                title = StoredPassword.validateTitle(title);
                 isValid = true;
             }
             catch (IllegalArgumentException e)
@@ -161,7 +161,7 @@ public class Menu
             try
             {
                 website = terminal.readLine("Enter website >> ");
-                StoredPassword.validateWebsite(website);
+                website = StoredPassword.validateWebsite(website);
                 isValid = true;
             }
             catch (IllegalArgumentException e)
@@ -203,17 +203,7 @@ public class Menu
         terminal.info("\n");
         String passwordTitle = getValidTitleFromUser();
         String passwordWebsite = getValidWebsiteFromUser();
-        String password;
-        if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >> "))
-        {
-
-            password = generatePasswordMenu();
-            terminal.info("Generated password: " + password + "\n");
-        }
-        else
-        {
-            password = getValidPasswordFromUser();
-        }
+        String password = generateValidPassword();
         if (checkPasswordUsage(password))
         {
             passwords.addNewPassword(passwordTitle, passwordWebsite, password);
@@ -225,6 +215,22 @@ public class Menu
             terminal.info("Password not added.\n");
         }
         terminal.info("\n");
+    }
+
+    private String generateValidPassword()
+    {
+        String password;
+        if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >>"))
+        {
+
+            password = generatePasswordMenu();
+            terminal.info("Generated password: " + password + "\n");
+        }
+        else
+        {
+            password = getValidPasswordFromUser();
+        }
+        return password;
     }
 
     private String generatePasswordMenu()
@@ -241,13 +247,13 @@ public class Menu
                 {
                     case '1':
                     {
-                        pass = StoredPassword.generateEasyToReadRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min 8)>> ", 8, Integer.MAX_VALUE));
+                        pass = StoredPassword.generateEasyToReadRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, Integer.MAX_VALUE));
                         runMenu = false;
                         break;
                     }
                     case '2':
                     {
-                        pass = StoredPassword.generateRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min 8)>> ", 8, Integer.MAX_VALUE));
+                        pass = StoredPassword.generateRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, Integer.MAX_VALUE));
                         runMenu = false;
                         break;
                     }
@@ -553,17 +559,7 @@ public class Menu
         terminal.info("You are about to edit this entry:\n");
         if (confirmPassword(passwordId))
         {
-            String password;
-            if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >>"))
-            {
-
-                password = generatePasswordMenu();
-                terminal.info("Generated password: " + password + "\n");
-            }
-            else
-            {
-                password = getValidPasswordFromUser();
-            }
+            String password = generateValidPassword();
             if (checkPasswordUsage(password))
             {
                 passwords.editPasswordPassword(passwordId, password);
