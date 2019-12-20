@@ -9,7 +9,7 @@ import java.util.Scanner;
  * <p>Uniform class for input/output through various methods.
  * Inspired by http://illegalargumentexception.blogspot.com/2010/09/java-systemconsole-ides-and-testing.html
  *
- * @author Luke Halpenny
+ * @author Luke Halpenny & Andrej Gorochov
  * @version 1.0
  */
 public class Terminal {
@@ -175,7 +175,7 @@ public class Terminal {
 
     public String readPassword() {
         if (this.console != null) {
-            return this.console.readPassword().toString(); //TODO ???
+            return new String(this.console.readPassword());
         } else {
             return this.inputScanner.nextLine();
         }

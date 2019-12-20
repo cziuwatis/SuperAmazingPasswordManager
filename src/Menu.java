@@ -22,7 +22,9 @@ public class Menu {
     private static final char HELP_CHAR = 'H';
     private static final char QUIT_CHAR = 'Q';
     private static final char BACK_CHAR = 'B';
-    private static final String ERR_CMD = "\t[!] Invalid command entered!";
+    private static final String ERR_LOAD_PASSWORDS = "Could not load passwords from file.";
+    private static final String ERR_STORE_PASSWORDS = "Could not store passwords in file.";
+    private static final String ERR_CMD = "Invalid command entered!";
     private static final String INPUT_PROMPT = "Enter >> ";
     private static final String HELP_TEXT = "";
     private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n 4. Remove passwords\n 5. Change master password\n H. Help\n Q. Quit";
@@ -457,11 +459,17 @@ public class Menu {
     }
 
     private void savePasswords() {
-        passwords.readPasswordsOut(DEFAULT_USER_PASSWORDS_PATH, this.key);
+        boolean done = passwords.readPasswordsOut(DEFAULT_USER_PASSWORDS_PATH, this.key);
+        if(!done) {
+            this.terminal.error(ERR_STORE_PASSWORDS);
+        }
     }
 
     private void loadPasswords() {
-        passwords.readPasswordsIn(DEFAULT_USER_PASSWORDS_PATH, this.key);
+        boolean done = passwords.readPasswordsIn(DEFAULT_USER_PASSWORDS_PATH, this.key);
+        if(!done) {
+            this.terminal.error(ERR_LOAD_PASSWORDS);
+        }
     }
 
 }

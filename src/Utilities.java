@@ -7,7 +7,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author
+ * Utilities class.
+ *
+ * <p>
+ * Description here.
+ *
+ * @author Luke Halpenny & Andrej Gorochov
+ * @version 1.0
  */
 public class Utilities {
 

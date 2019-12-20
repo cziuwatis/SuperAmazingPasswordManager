@@ -122,9 +122,7 @@ public final class StoredPassword
             if(Utilities.isCommonPassword(password)) {
                 throw new PasswordException("Password must not match a common password.");
             }
-        } catch (FileNotFoundException e) {
-            //TODO throw error if cant find common.txt? or just ignore test?
-        }
+        } catch (FileNotFoundException ignored) {}
 
         return true;
     }
@@ -222,13 +220,16 @@ public final class StoredPassword
             throw new IllegalArgumentException("Invalid URL.");
         }
         String hostname = matcher.group(2);
+        if (hostname.startsWith(".")) {
+            throw new IllegalArgumentException("Invalid URL. Can't have a dot at the end of site hostname.");
+        }
         if (hostname.matches("(\\.){2,}"))
         {
-            throw new IllegalArgumentException("Invalid URL. Can't have 2 consecutive dots in the hostname");
+            throw new IllegalArgumentException("Invalid URL. Can't have 2 consecutive dots in the hostname.");
         }
-        if (hostname.matches(".*\\.$"))
+        if (hostname.endsWith("."))
         {
-            throw new IllegalArgumentException("Invalid URL. Can't have a dot at the end of site hostname");
+            throw new IllegalArgumentException("Invalid URL. Can't have a dot at the end of site hostname.");
         }
         return website;
     }
@@ -287,9 +288,7 @@ public final class StoredPassword
     }
 
     public String toCSVLine()
-    {//I can probably make a string and just run the replaceAll once instead of one by one
-        //though there might be other stuff we want to check for each one so I'll leave it like it is
-        //Another note, even though we are removing \n and \r in our validation
+    {
         String sanitizedTitle = this.getTitle().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
         String sanitizedWebsite = this.getWebsite().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
         String sanitizedPassword = this.getPassword().replaceAll(",", "&#44;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
