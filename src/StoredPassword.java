@@ -1,3 +1,4 @@
+
 import java.security.SecureRandom;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
@@ -41,7 +42,9 @@ public final class StoredPassword
                 StoredPassword.validatePassword(pass.toString());
                 isValidPassword = true;
             }
-            catch (PasswordException ignored) {}
+            catch (PasswordException ignored)
+            {
+            }
         }
         return pass.toString();
     }
@@ -91,7 +94,9 @@ public final class StoredPassword
                 StoredPassword.validatePassword(pass.toString());
                 isValidPassword = true;
             }
-            catch (PasswordException ignored) {}
+            catch (PasswordException ignored)
+            {
+            }
         }
         return pass.toString();
     }
@@ -103,26 +108,35 @@ public final class StoredPassword
             throw new PasswordException("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
         }
         String hasNumber = "[0-9]+";
-        if(!Utilities.matchesRegex(password, hasNumber)) {
+        if (!Utilities.matchesRegex(password, hasNumber))
+        {
             throw new PasswordException("Password must have at least one number.");
         }
         String hasLower = "[a-z]+";
-        if(!Utilities.matchesRegex(password, hasLower)) {
+        if (!Utilities.matchesRegex(password, hasLower))
+        {
             throw new PasswordException("Password must have at least one lowercase letter.");
         }
         String hasUpper = "[A-Z]+";
-        if(!Utilities.matchesRegex(password, hasUpper)) {
+        if (!Utilities.matchesRegex(password, hasUpper))
+        {
             throw new PasswordException("Password must have at least one uppercase letter.");
         }
         String hasSymbol = "[^a-zA-z0-9]+";
-        if(!Utilities.matchesRegex(password, hasSymbol)) {
+        if (!Utilities.matchesRegex(password, hasSymbol))
+        {
             throw new PasswordException("Password must have at least one symbol.");
         }
-        try {
-            if(Utilities.isCommonPassword(password)) {
+        try
+        {
+            if (Utilities.isCommonPassword(password))
+            {
                 throw new PasswordException("Password must not match a common password.");
             }
-        } catch (FileNotFoundException ignored) {}
+        }
+        catch (FileNotFoundException ignored)
+        {
+        }
 
         return true;
     }
@@ -190,6 +204,10 @@ public final class StoredPassword
 
     public static String validateTitle(String title)
     {
+        if (title == null)
+        {
+            throw new IllegalArgumentException("Title cannot be null");
+        }
         title = title.replaceAll("[\n\r]", "").trim();
         if (title.length() > 255)
         {
@@ -200,6 +218,10 @@ public final class StoredPassword
 
     public void setTitle(String title)
     {
+        if (title == null)
+        {
+            throw new IllegalArgumentException("Title cannot be null.");
+        }
         title = validateTitle(title);
         this.title = title;
         this.setLastUpdated();
@@ -212,6 +234,10 @@ public final class StoredPassword
 
     public static String validateWebsite(String website)
     {
+        if (website == null)
+        {
+            throw new IllegalArgumentException("Website cannot be null.");
+        }
         website = website.replaceAll("[\n\r]", "").trim();
         Pattern urlRegex = Pattern.compile("^(https?://)?([a-zA-Z0-9.-]+)(:[0-9]{1,4})?$");
         Matcher matcher = urlRegex.matcher(website);
@@ -220,7 +246,8 @@ public final class StoredPassword
             throw new IllegalArgumentException("Invalid URL.");
         }
         String hostname = matcher.group(2);
-        if (hostname.startsWith(".")) {
+        if (hostname.startsWith("."))
+        {
             throw new IllegalArgumentException("Invalid URL. Can't have a dot at the end of site hostname.");
         }
         if (hostname.matches("(\\.){2,}"))
@@ -236,6 +263,10 @@ public final class StoredPassword
 
     public void setWebsite(String website)
     {
+        if (website == null)
+        {
+            throw new IllegalArgumentException("Website cannot be null.");
+        }
         validateWebsite(website);
         this.website = website;
         this.setLastUpdated();
@@ -248,6 +279,10 @@ public final class StoredPassword
 
     public static void validatePassword(String password)
     {
+        if (password == null)
+        {
+            throw new IllegalArgumentException("Password cannot be null.");
+        }
         if (password.isEmpty())
         {
             throw new IllegalArgumentException("Password can not be empty.");
@@ -257,6 +292,10 @@ public final class StoredPassword
 
     public void setPassword(String password)
     {
+        if (password == null)
+        {
+            throw new IllegalArgumentException("Password cannot be null.");
+        }
         validatePassword(password);
         this.password = password;
         this.setLastUpdated();

@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author Luke Halpenny & Andrej Gorochov
  */
 public class TitleSearchFilter implements PasswordSearchFilter {
     @Override
