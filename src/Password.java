@@ -125,7 +125,7 @@ public class Password {
    */
   public void setSalt(String salt) {
     byte[] saltAsBytes = Base64.getDecoder().decode(salt);
-    if(saltAsBytes.length < 32) {
+    if(saltAsBytes.length < SALT_BYTES) {
       throw new PasswordException(ERR_WEAK_SALT);
     }
     this.salt = salt;
