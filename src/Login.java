@@ -133,10 +133,6 @@ public class Login {
             } catch (PasswordException e) {
                 this.terminal.warn(WARN_WEAK_PASSWORD);
                 this.terminal.warn(e.getMessage() + "\n");
-            } catch (RuntimeException e) { // FileNotFoundException
-                this.terminal.error(ERR_COMMON_FILE_MISSING);
-                this.terminal.error(ERR_EXIT);
-                System.exit(1);
             }
         }
         Password pass = new Password(masterPassword, this.masterSalt);

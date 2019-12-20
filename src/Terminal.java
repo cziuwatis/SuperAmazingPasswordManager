@@ -175,7 +175,7 @@ public class Terminal {
 
     public String readPassword() {
         if (this.console != null) {
-            return this.console.readPassword().toString(); //TODO ???
+            return new String(this.console.readPassword());
         } else {
             return this.inputScanner.nextLine();
         }
