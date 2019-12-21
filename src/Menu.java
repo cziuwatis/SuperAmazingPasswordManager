@@ -82,6 +82,7 @@ public class Menu {
                         break;
                     }
                     case '4': {
+                        displayEntries(this.passwords.getUserPasswords(), true);
                         removePasswords();
                         break;
                     }
@@ -161,6 +162,36 @@ public class Menu {
         }
         return password;
     }
+    
+    //for the press enter to generate password
+    private String getValidPasswordFromUser(boolean askToGeneratePassword) {
+        String queryMessage = "Enter password ";
+        if (askToGeneratePassword)
+        {
+            queryMessage += "(leave empty to generate password) ";
+        }
+        queryMessage += ">> ";
+        String password = "";
+        boolean isValid = false;
+        while (!isValid) {
+            try {
+                password = terminal.readPassword(queryMessage);
+                if (password.length() == 0 && askToGeneratePassword)
+                {
+                    password = generatePasswordMenu();
+                    terminal.info("Generated password: " + password + "\n");
+                }
+                else
+                {
+                    StoredPassword.validatePassword(password);
+                }
+                isValid = true;
+            } catch (PasswordException | IllegalArgumentException e) {
+                terminal.error(e.getMessage() + " (Please try again)\n");
+            }
+        }
+        return password;
+    }
 
     /**
      * Adding a new password option.
@@ -172,7 +203,7 @@ public class Menu {
         terminal.info("\n");
         String passwordTitle = getValidTitleFromUser();
         String passwordWebsite = getValidWebsiteFromUser();
-        String password = generateValidPassword();
+        String password = getValidPasswordFromUser(true);
         if (checkPasswordUsage(password)) {
             passwords.addNewPassword(passwordTitle, passwordWebsite, password);
             savePasswords();
@@ -183,17 +214,17 @@ public class Menu {
         terminal.info("\n");
     }
 
-    private String generateValidPassword() {
-        String password;
-        if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >>")) {
-
-            password = generatePasswordMenu();
-            terminal.info("Generated password: " + password + "\n");
-        } else {
-            password = getValidPasswordFromUser();
-        }
-        return password;
-    }
+//    private String generateValidPassword() {
+//        String password;
+//        if (Utilities.getYesNoAnswer(terminal, "Do you want us to generate a password for you? >>")) {
+//
+//            password = generatePasswordMenu();
+//            terminal.info("Generated password: " + password + "\n");
+//        } else {
+//            password = getValidPasswordFromUser();
+//        }
+//        return password;
+//    }
 
     private String generatePasswordMenu() {
         String pass = "";
@@ -375,14 +406,17 @@ public class Menu {
             if (command.trim().length() == 1) {
                 switch (command.trim().toUpperCase().charAt(0)) {
                     case '1': {
+                        displayEntries(this.passwords.getUserPasswords(), true);
                         editPasswordTitle();
                         break;
                     }
                     case '2': {
+                        displayEntries(this.passwords.getUserPasswords(), true);
                         editPasswordWebsite();
                         break;
                     }
                     case '3': {
+                        displayEntries(this.passwords.getUserPasswords(), true);
                         editPasswordPassword();
                         break;
                     }
@@ -448,7 +482,7 @@ public class Menu {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >> ", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
         if (confirmPassword(passwordId)) {
-            String password = generateValidPassword();
+            String password = getValidPasswordFromUser(true);
             if (checkPasswordUsage(password)) {
                 passwords.editPasswordPassword(passwordId, password);
                 savePasswords();
