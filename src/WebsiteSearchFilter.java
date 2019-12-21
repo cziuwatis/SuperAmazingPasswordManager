@@ -1,5 +1,6 @@
 
 /**
+ * Filter for getting website string.
  * @author Luke Halpenny & Andrej Gorochov
  */
 public class WebsiteSearchFilter implements PasswordSearchFilter {

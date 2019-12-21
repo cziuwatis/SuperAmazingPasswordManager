@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
  * Utilities class.
  *
  * <p>
- * Description here.
+ * A class for general utilities.
+ * </p>
  *
  * @author Luke Halpenny & Andrej Gorochov
  * @version 1.0
