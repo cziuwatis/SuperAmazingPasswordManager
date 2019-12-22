@@ -181,6 +181,7 @@ public class Terminal {
                 this.outputWriter.println("\t[!] Invalid option.");
                 this.outputWriter.println("\t[!] Try use color anyway?");
                 this.outputWriter.print("Yes / No >> ");
+                this.outputWriter.flush();
             }
         }
         return false;
