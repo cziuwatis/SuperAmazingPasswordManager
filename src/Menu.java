@@ -58,6 +58,7 @@ public class Menu
                     Terminal.COLOR_BLUE + " 2. " + Terminal.COLOR_RESET + "Generate unrestricted password";
     private static final String DEFAULT_BORDER = "-";
     private static final int DEFAULT_BORDER_LENGTH = 130;
+    private static final int MAX_PASSWORD_LENGTH = 2048;
     private static final String DEFAULT_USER_PASSWORDS_PATH = "passwordStore.txt";
     private static final String DEFAULT_USER_FILEPATH = "user.txt";
     public static final String MENU_TITLE = Terminal.COLOR_CYAN + "SUPER AMAZING PASSWORD MANAGER" + Terminal.COLOR_RESET;
@@ -339,13 +340,13 @@ public class Menu
                 {
                     case '1':
                     {
-                        pass = StoredPassword.generateEasyToReadRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, Integer.MAX_VALUE));
+                        pass = StoredPassword.generateEasyToReadRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH));
                         runMenu = false;
                         break;
                     }
                     case '2':
                     {
-                        pass = StoredPassword.generateRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, Integer.MAX_VALUE));
+                        pass = StoredPassword.generateRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH));
                         runMenu = false;
                         break;
                     }
