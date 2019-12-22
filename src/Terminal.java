@@ -82,6 +82,9 @@ public class Terminal {
 
     }
 
+    /**
+     * Reads options such as color support from a settings file.
+     */
     private void readSettingsFile() {
         // Read .ini file
         try (FileInputStream fileIn = new FileInputStream(SETTINGS_FILE_PATH)) {
@@ -127,6 +130,9 @@ public class Terminal {
         }
     }
 
+    /**
+     * Writes settings to disc.
+     */
     private void writeSettingsFile() {
         try (OutputStream output = new FileOutputStream(SETTINGS_FILE_PATH)) {
             this.settings.store(output, null);
@@ -135,6 +141,10 @@ public class Terminal {
         }
     }
 
+    /**
+     * Tries to detect whether the terminal supports color. Asks user if not detected.
+     * @return whether to enable color support.
+     */
     private boolean detectColor() {
         // Try to auto detect ANSI color support
         String termType = System.getenv().get("TERM");
@@ -150,6 +160,10 @@ public class Terminal {
         }
     }
 
+    /**
+     * Asks the user whether to enable color support.
+     * @return whether to enable color support.
+     */
     private boolean askColor() {
         this.outputWriter.println("\t[!] Warning! Could not detect whether color is supported by this terminal.");
         this.outputWriter.printf("\t[!] Try use color anyway? (Color Sample: [%s]\n", sampleColors());

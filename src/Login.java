@@ -20,7 +20,6 @@ public class Login {
 
     public static final String LOGIN_TEXT = Terminal.COLOR_YELLOW + "Enter master password (or 'q' to quit):\n" + Terminal.COLOR_RESET;
     public static final String LOGIN_PROMPT = ">> ";
-    public static final String WARN_FNF = "Could not load user file. Create one now?\n";
     public static final String WARN_NO_USER_DATA = "Couldn't read user data. Create new user?\n\t(Note: Currently stored data will become unreadable)\n";
     public static final String ERR_NO_USER_DATA = "Couldn't read user data.\n";
     public static final String WARN_WEAK_PASSWORD = "Your password does not meet minimum requirements! Please use a stronger password.\n";
@@ -36,6 +35,10 @@ public class Login {
     private String masterSalt;
     private String decryptSalt;
 
+    /**
+     * Login class for getting the users master password and ensuring it is correct
+     * @param terminal a Terminal to print to and get input from
+     */
     public Login(Terminal terminal) {
         this.terminal = terminal;
         this.numAttempts = 0;
@@ -56,6 +59,10 @@ public class Login {
         }
     }
 
+    /**
+     * Authenticates the user. Returns the password store decryption key on success or null on fail.
+     * @return the decryption key for the password store.
+     */
     public String login() {
         if (this.masterHash == null || this.masterSalt == null || this.decryptSalt == null) {
             // Couldn't read user file
@@ -94,7 +101,10 @@ public class Login {
         return null;
     }
 
-    public void loginWait() {
+    /**
+     * Exponential wait before trying again
+     */
+    private void loginWait() {
         long waitSeconds = calcWaitSeconds();
         this.terminal.warn(String.format(INCORRECT_PASSWORD, waitSeconds));
         try {
@@ -104,11 +114,18 @@ public class Login {
         }
     }
 
-    public long calcWaitSeconds() {
+    /**
+     * Calculates number of seconds to wait before allowing to try again
+     * @return number of seconds to wait
+     */
+    private long calcWaitSeconds() {
         return this.numAttempts > 0 ? (long) Math.pow(2, this.numAttempts - 1) : 0;
     }
 
-    public void createNewUser() {
+    /**
+     * Creates a new user and stores it in file user.txt
+     */
+    private void createNewUser() {
         this.masterSalt = Password.generateRandomSalt();
         this.terminal.info(Terminal.COLOR_YELLOW + "Please enter a master password." + Terminal.COLOR_RESET +
                 " This will be used to encrypt all of your passwords.\n" +
@@ -139,7 +156,10 @@ public class Login {
         this.writeToUserFile();
     }
 
-    public void writeToUserFile() {
+    /**
+     * Writes user details to user.txt.
+     */
+    private void writeToUserFile() {
         try (
                 FileWriter fileWriter = new FileWriter(FILE_PATH);
                 PrintWriter printWriter = new PrintWriter(fileWriter)) {
@@ -155,6 +175,13 @@ public class Login {
 
     }
 
+    /**
+     * Writes user details to user.txt.
+     * @param terminal Terminal for printing errors
+     * @param masterSalt the user password login salt
+     * @param masterHash the user password login hash
+     * @param decryptSalt the user password decryption salt
+     */
     public static void writeToUserFile(Terminal terminal, String masterSalt, String masterHash, String decryptSalt) {
         try (
                 FileWriter fileWriter = new FileWriter(FILE_PATH);

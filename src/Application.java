@@ -12,12 +12,18 @@ public class Application {
     private Login login;
     private Menu menu;
 
+    /**
+     * Main application class. Initialises Terminal, Login and Menu.
+     */
     public Application() {
         this.terminal = new Terminal();
         this.login = new Login(terminal);
         this.menu = new Menu();
     }
 
+    /**
+     * Runs the application.
+     */
     public void run() {
         String key = login.login();
         if (key == null) {
