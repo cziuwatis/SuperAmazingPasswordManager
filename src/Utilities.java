@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
  */
 public class Utilities {
 
-    public static final String COMMON_PASSWORDS_PATH = "common.txt";
+    public static final String COMMON_PASSWORDS_PATH = "/resources/common.txt";
 
     /**
      * Prints available menu options with a menu title bordered by the specified
@@ -157,17 +158,30 @@ public class Utilities {
      * @return whether the password turns up on a list of common passwords
      */
     public static boolean isCommonPassword(String password) throws FileNotFoundException {
-        File fileObj = new File(COMMON_PASSWORDS_PATH);
-        try (Scanner scanner = new Scanner(fileObj)) {
-            while (scanner.hasNextLine()) {
-                String common = scanner.nextLine();
-                if (password.equalsIgnoreCase(common)) {
-                    return true;
+        InputStream fileStream = Utilities.class.getClassLoader().getResourceAsStream(COMMON_PASSWORDS_PATH);
+        if (fileStream != null) {
+            try (Scanner scanner = new Scanner(fileStream)) {
+                while (scanner.hasNextLine()) {
+                    String common = scanner.nextLine();
+                    if (password.equalsIgnoreCase(common)) {
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
-        } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("Cannot find common password list");
+        } else {
+            File fileObj = new File("." + COMMON_PASSWORDS_PATH);
+            try (Scanner scanner = new Scanner(fileObj)) {
+                while (scanner.hasNextLine()) {
+                    String common = scanner.nextLine();
+                    if (password.equalsIgnoreCase(common)) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (FileNotFoundException e) {
+                throw new FileNotFoundException("Cannot find common password list");
+            }
         }
     }
 }

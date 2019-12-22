@@ -11,5 +11,4 @@ public class Main {
         Application app = new Application();
         app.run();
     }
-
 }
