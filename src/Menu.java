@@ -14,8 +14,7 @@ import java.util.Scanner;
  * @author Luke Halpenny & Andrej Gorochov
  * @version 1.0
  */
-public class Menu
-{
+public class Menu {
 
     /*
      *  CONSTANTS
@@ -77,8 +76,7 @@ public class Menu
     /**
      * Constructor for Menu class.
      */
-    public Menu()
-    {
+    public Menu() {
         this.running = false;
         this.terminal = new Terminal();
         this.passwords = new PasswordStorage();
@@ -91,64 +89,50 @@ public class Menu
      *
      * @param key key to be used for decryption/encryption of passwords
      */
-    public void run(String key)
-    {
+    public void run(String key) {
         this.running = true;
         this.key = key;
         loadPasswords();
-        while (this.running)
-        {
+        while (this.running) {
             Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, MAIN_MENU_OPTIONS, MENU_TITLE);
             String command = terminal.readLine(INPUT_PROMPT);
-            if (command.trim().length() == 1)
-            {
-                switch (command.trim().toUpperCase().charAt(0))
-                {
-                    case '1':
-                    {
+            if (command.trim().length() == 1) {
+                switch (command.trim().toUpperCase().charAt(0)) {
+                    case '1': {
                         addNewPassword();
                         break;
                     }
-                    case '2':
-                    {
+                    case '2': {
                         viewPasswords();
                         break;
                     }
-                    case '3':
-                    {
+                    case '3': {
                         editPasswords();
                         break;
                     }
-                    case '4':
-                    {
+                    case '4': {
                         displayEntries(this.passwords.getUserPasswords(), true);
                         removePasswords();
                         break;
                     }
-                    case '5':
-                    {
+                    case '5': {
                         changeMasterPassword();
                         break;
                     }
-                    case HELP_CHAR:
-                    {
+                    case HELP_CHAR: {
                         Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, HELP_TEXT, MENU_HELP_TITLE);
                         break;
                     }
-                    case QUIT_CHAR:
-                    {
+                    case QUIT_CHAR: {
                         exit();
                         break;
                     }
-                    default:
-                    {
+                    default: {
                         terminal.error(ERR_CMD);
                         break;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 terminal.error(ERR_CMD);
             }
         }
@@ -157,8 +141,7 @@ public class Menu
     /**
      * Exits from main event loop.
      */
-    private void exit()
-    {
+    private void exit() {
         savePasswords();
         terminal.info("Goodbye!");
         this.running = false;
@@ -170,20 +153,15 @@ public class Menu
      *
      * @return string of a valid title.
      */
-    public String getValidTitleFromUser()
-    {
+    public String getValidTitleFromUser() {
         String title = "";
         boolean isValid = false;
-        while (!isValid)
-        {
-            try
-            {
+        while (!isValid) {
+            try {
                 title = terminal.readLine("Enter title >> ");
                 title = StoredPassword.validateTitle(title);
                 isValid = true;
-            }
-            catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
                 terminal.error(e.getMessage() + " (Please try again)\n");
             }
         }
@@ -196,20 +174,15 @@ public class Menu
      *
      * @return string of a valid website.
      */
-    public String getValidWebsiteFromUser()
-    {
+    public String getValidWebsiteFromUser() {
         String website = "";
         boolean isValid = false;
-        while (!isValid)
-        {
-            try
-            {
+        while (!isValid) {
+            try {
                 website = terminal.readLine("Enter website >> ");
                 website = StoredPassword.validateWebsite(website);
                 isValid = true;
-            }
-            catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
                 terminal.error(e.getMessage() + " (Please try again)\n");
             }
         }
@@ -223,20 +196,15 @@ public class Menu
      *
      * @return string of a valid password
      */
-    public String getValidPasswordFromUser()
-    {
+    public String getValidPasswordFromUser() {
         String password = "";
         boolean isValid = false;
-        while (!isValid)
-        {
-            try
-            {
+        while (!isValid) {
+            try {
                 password = terminal.readPassword("Enter password >> ");
                 StoredPassword.validatePassword(password);
                 isValid = true;
-            }
-            catch (PasswordException | IllegalArgumentException e)
-            {
+            } catch (PasswordException | IllegalArgumentException e) {
                 terminal.error(e.getMessage() + " (Please try again)\n");
             }
         }
@@ -249,37 +217,28 @@ public class Menu
      * password is generated if flag enabled.
      *
      * @param askToGeneratePassword flag for enabling pressing enter to generate
-     * password.
+     *                              password.
      * @return string of a valid password.
      */
-    private String getValidPasswordFromUser(boolean askToGeneratePassword)
-    {
+    private String getValidPasswordFromUser(boolean askToGeneratePassword) {
         String queryMessage = "Enter password ";
-        if (askToGeneratePassword)
-        {
+        if (askToGeneratePassword) {
             queryMessage += "(leave empty to generate password) ";
         }
         queryMessage += ">> ";
         String password = "";
         boolean isValid = false;
-        while (!isValid)
-        {
-            try
-            {
+        while (!isValid) {
+            try {
                 password = terminal.readPassword(queryMessage);
-                if (password.length() == 0 && askToGeneratePassword)
-                {
+                if (password.length() == 0 && askToGeneratePassword) {
                     password = generatePasswordMenu();
                     terminal.info(Terminal.COLOR_BLUE + "Generated password: " + Terminal.COLOR_RESET + password + "\n");
-                }
-                else
-                {
+                } else {
                     StoredPassword.validatePassword(password);
                 }
                 isValid = true;
-            }
-            catch (PasswordException | IllegalArgumentException e)
-            {
+            } catch (PasswordException | IllegalArgumentException e) {
                 terminal.error(e.getMessage() + " (Please try again)\n");
             }
         }
@@ -289,8 +248,7 @@ public class Menu
     /**
      * Adding a new password option.
      */
-    private void addNewPassword()
-    {
+    private void addNewPassword() {
         Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
         terminal.info("\nAdding a new password\n");
         Utilities.printString(terminal, "-", DEFAULT_BORDER_LENGTH);
@@ -298,14 +256,11 @@ public class Menu
         String passwordTitle = getValidTitleFromUser();
         String passwordWebsite = getValidWebsiteFromUser();
         String password = getValidPasswordFromUser(true);
-        if (checkPasswordUsage(password))
-        {
+        if (checkPasswordUsage(password)) {
             passwords.addNewPassword(passwordTitle, passwordWebsite, password);
             savePasswords();
             displayPasswordDetails(passwords.getLatestPasswordId());
-        }
-        else
-        {
+        } else {
             terminal.info("Password not added.\n");
         }
         terminal.info("\n");
@@ -322,44 +277,36 @@ public class Menu
 //        }
 //        return password;
 //    }
+
     /**
      * Generates a password according to the user choice.
      *
      * @return String of the generated password.
      */
-    private String generatePasswordMenu()
-    {
+    private String generatePasswordMenu() {
         String pass = "";
         boolean runMenu = true;
-        while (runMenu)
-        {
+        while (runMenu) {
             Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, GENERATE_PASSWORDS_OPTIONS, MENU_GENPASS_TITLE);
             String command = terminal.readLine(INPUT_PROMPT);
-            if (command.trim().length() == 1)
-            {
-                switch (command.trim().toUpperCase().charAt(0))
-                {
-                    case '1':
-                    {
+            if (command.trim().length() == 1) {
+                switch (command.trim().toUpperCase().charAt(0)) {
+                    case '1': {
                         pass = StoredPassword.generateEasyToReadRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH));
                         runMenu = false;
                         break;
                     }
-                    case '2':
-                    {
+                    case '2': {
                         pass = StoredPassword.generateRandomPassword(Utilities.getInt(terminal, "Enter desired password length (min " + StoredPassword.MIN_PASSWORD_LENGTH + ")>> ", StoredPassword.MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH));
                         runMenu = false;
                         break;
                     }
-                    default:
-                    {
+                    default: {
                         terminal.error(ERR_CMD);
                         break;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 terminal.error(ERR_CMD);
             }
         }
@@ -369,46 +316,35 @@ public class Menu
     /**
      * Options to view passwords.
      */
-    private void viewPasswords()
-    {
+    private void viewPasswords() {
         boolean runMenu = true;
-        while (runMenu)
-        {
+        while (runMenu) {
             Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, VIEW_PASSWORDS_MENU_OPTIONS, MENU_VIEW_TITLE);
             String command = terminal.readLine(INPUT_PROMPT);
-            if (command.trim().length() == 1)
-            {
-                switch (command.trim().toUpperCase().charAt(0))
-                {
-                    case '1':
-                    {
+            if (command.trim().length() == 1) {
+                switch (command.trim().toUpperCase().charAt(0)) {
+                    case '1': {
                         viewAllEntries();
                         break;
                     }
-                    case '2':
-                    {
+                    case '2': {
                         searchByTitle();
                         break;
                     }
-                    case '3':
-                    {
+                    case '3': {
                         searchByWebsite();
                         break;
                     }
-                    case BACK_CHAR:
-                    {
+                    case BACK_CHAR: {
                         runMenu = false;
                         break;
                     }
-                    default:
-                    {
+                    default: {
                         terminal.error(ERR_CMD);
                         break;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 terminal.error(ERR_CMD);
             }
         }
@@ -423,11 +359,9 @@ public class Menu
      * password is not being used in any other web. False if user doesn't want
      * to use the password again.
      */
-    private boolean checkPasswordUsage(String password)
-    {
+    private boolean checkPasswordUsage(String password) {
 
-        if (passwords.isPasswordUsed(password))
-        {
+        if (passwords.isPasswordUsed(password)) {
             terminal.warn("You have previously used this password, are you sure you want use it again?");
             return Utilities.getYesNoAnswer(terminal, ">> ");
         }
@@ -437,14 +371,11 @@ public class Menu
     /**
      * Option to remove passwords.
      */
-    private void removePasswords()
-    {
+    private void removePasswords() {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >> ", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to remove this entry:\n");
-        if (confirmPassword(passwordId))
-        {
-            if (passwords.removePassword(passwordId))
-            {
+        if (confirmPassword(passwordId)) {
+            if (passwords.removePassword(passwordId)) {
                 savePasswords();
                 terminal.info("Password entry has been removed\n");
             }
@@ -455,26 +386,20 @@ public class Menu
     /**
      * Changes the master password of the user.
      */
-    private void changeMasterPassword()
-    {
+    private void changeMasterPassword() {
         String oldMasterSalt = null;
         String oldMasterHash = null;
-        try (Scanner inFile = new Scanner(new File(DEFAULT_USER_FILEPATH)))
-        {
-            if (inFile.hasNextLine())
-            {
+        try (Scanner inFile = new Scanner(new File(DEFAULT_USER_FILEPATH))) {
+            if (inFile.hasNextLine()) {
                 oldMasterSalt = inFile.nextLine();
             }
-            if (inFile.hasNextLine())
-            {
+            if (inFile.hasNextLine()) {
                 oldMasterHash = inFile.nextLine();
             }
-            if (oldMasterSalt != null && oldMasterHash != null)
-            {
+            if (oldMasterSalt != null && oldMasterHash != null) {
                 terminal.warn("You are about to change your master password used to login into the service\n");
                 terminal.info("Please enter your current master password to proceed.\n");
-                if (new Password(getValidPasswordFromUser(), oldMasterSalt).matchesHash(oldMasterHash))
-                {
+                if (new Password(getValidPasswordFromUser(), oldMasterSalt).matchesHash(oldMasterHash)) {
                     String newMasterSalt = Password.generateRandomSalt();
                     String newDecryptSalt = Password.generateRandomSalt();
                     terminal.info("Master password matches! Now please enter a new master password.\n");
@@ -483,19 +408,13 @@ public class Menu
                     this.key = new Password(newMasterPassword, newDecryptSalt).generateHash();
                     savePasswords();
                     terminal.info("Master password successfully changed!");
-                }
-                else
-                {
+                } else {
                     terminal.error("Entered master password does not match!\n");
                 }
-            }
-            else
-            {
+            } else {
                 terminal.error("Stored master salt and/or hash failed to load.");
             }
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             terminal.error("User text file was not found! Unable to change master password");
         }
 
@@ -506,12 +425,10 @@ public class Menu
      * displayed if found and empty if not found. Gives ability to reveal
      * passwords of found entries.
      */
-    private void searchByTitle()
-    {
+    private void searchByTitle() {
         ArrayList<StoredPassword> searchPasswords = passwords.getUserPasswords(terminal.readLine("Enter title to search for >> "), new TitleSearchFilter());
         displayEntries(searchPasswords, true);
-        if (searchPasswords.size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >> "))
-        {
+        if (searchPasswords.size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >> ")) {
             displayEntries(searchPasswords, false);
         }
     }
@@ -521,12 +438,10 @@ public class Menu
      * displayed if found and empty if not found. Gives ability to reveal
      * passwords of found entries.
      */
-    private void searchByWebsite()
-    {
+    private void searchByWebsite() {
         ArrayList<StoredPassword> searchPasswords = passwords.getUserPasswords(terminal.readLine("Enter website to search for >> "), new WebsiteSearchFilter());
         displayEntries(searchPasswords, true);
-        if (searchPasswords.size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >> "))
-        {
+        if (searchPasswords.size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >> ")) {
             displayEntries(searchPasswords, false);
         }
     }
@@ -535,11 +450,9 @@ public class Menu
      * Displays all entries. Entries are displayed even if found or none are
      * found. Gives ability to reveal passwords of found entries.
      */
-    private void viewAllEntries()
-    {
+    private void viewAllEntries() {
         displayEntries(passwords.getUserPasswords(), true);
-        if (passwords.getUserPasswords().size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >> "))
-        {
+        if (passwords.getUserPasswords().size() > 0 && Utilities.getYesNoAnswer(terminal, "Reveal passwords? >> ")) {
             displayEntries(passwords.getUserPasswords(), false);
         }
     }
@@ -548,28 +461,25 @@ public class Menu
      * Neatly displays the passed in entries with ability to display the entry
      * password.
      *
-     * @param entries entries to be displayed
+     * @param entries      entries to be displayed
      * @param hidePassword flag for displaying password of entries. If true then
-     * passwords won't be displayed, if false passwords will be visible.
+     *                     passwords won't be displayed, if false passwords will be visible.
      */
-    private void displayEntries(List<StoredPassword> entries, boolean hidePassword)
-    {
+    private void displayEntries(List<StoredPassword> entries, boolean hidePassword) {
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");
         terminal.info(String.format(Terminal.COLOR_BLUE + "%-7s   %-20s   %-30s   %s" + Terminal.COLOR_RESET + "\n",
                 "ID", "Title", "Website", "Password"));
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");
-        for (StoredPassword entry : entries)
-        {
+        for (StoredPassword entry : entries) {
             String password = "**********";
-            if(passwords.isDuplicate(entry.getPassword())) {
+            if (passwords.isDuplicate(entry.getPassword())) {
                 password = Terminal.COLOR_YELLOW + password + " [Duplicate]" + Terminal.COLOR_RESET;
             }
-            if (!hidePassword)
-            {
+            if (!hidePassword) {
                 password = entry.getPassword();
-                if(passwords.isDuplicate(password)) {
+                if (passwords.isDuplicate(password)) {
                     password = Terminal.COLOR_YELLOW + password + " [Duplicate]" + Terminal.COLOR_RESET;
                 }
             }
@@ -584,49 +494,38 @@ public class Menu
     /**
      * Options to edit passwords
      */
-    private void editPasswords()
-    {
+    private void editPasswords() {
         boolean runMenu = true;
-        while (runMenu)
-        {
+        while (runMenu) {
             Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, EDIT_PASSWORDS_MENU_OPTIONS, "EDIT PASSWORDS MENU");
             String command = terminal.readLine(INPUT_PROMPT);
-            if (command.trim().length() == 1)
-            {
-                switch (command.trim().toUpperCase().charAt(0))
-                {
-                    case '1':
-                    {
+            if (command.trim().length() == 1) {
+                switch (command.trim().toUpperCase().charAt(0)) {
+                    case '1': {
                         displayEntries(this.passwords.getUserPasswords(), true);
                         editPasswordTitle();
                         break;
                     }
-                    case '2':
-                    {
+                    case '2': {
                         displayEntries(this.passwords.getUserPasswords(), true);
                         editPasswordWebsite();
                         break;
                     }
-                    case '3':
-                    {
+                    case '3': {
                         displayEntries(this.passwords.getUserPasswords(), true);
                         editPasswordPassword();
                         break;
                     }
-                    case BACK_CHAR:
-                    {
+                    case BACK_CHAR: {
                         runMenu = false;
                         break;
                     }
-                    default:
-                    {
+                    default: {
                         terminal.error(ERR_CMD);
                         break;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 terminal.error(ERR_CMD);
             }
         }
@@ -641,21 +540,14 @@ public class Menu
      * @return true if user confirms entry. False if user doesn't confirm entry
      * or entry doesn't exist.
      */
-    private boolean confirmPassword(int passwordId)
-    {
-        if (displayPasswordDetails(passwordId))
-        {
-            if (Utilities.getYesNoAnswer(terminal, "Is this the correct entry? >> "))
-            {
+    private boolean confirmPassword(int passwordId) {
+        if (displayPasswordDetails(passwordId)) {
+            if (Utilities.getYesNoAnswer(terminal, "Is this the correct entry? >> ")) {
                 return true;
-            }
-            else
-            {
+            } else {
                 terminal.info("Entry not confirmed\n");
             }
-        }
-        else
-        {
+        } else {
             terminal.error("Password with such id doesn't exist\n");
         }
         return false;
@@ -668,11 +560,9 @@ public class Menu
      * @param passwordId Stored Password id to be searched for
      * @return true if found and details displayed. False if not found.
      */
-    private boolean displayPasswordDetails(int passwordId)
-    {
+    private boolean displayPasswordDetails(int passwordId) {
         StoredPassword passwordDetails = passwords.getPasswordDetails(passwordId);
-        if (passwordDetails != null)
-        {
+        if (passwordDetails != null) {
             terminal.info(Terminal.COLOR_BLUE + "Title        : " + Terminal.COLOR_RESET + passwordDetails.getTitle() +
                     Terminal.COLOR_BLUE + "\nWebsite      : " + Terminal.COLOR_RESET + passwordDetails.getWebsite() +
                     Terminal.COLOR_BLUE + "\nLast updated : " + Terminal.COLOR_RESET + passwordDetails.getLastUpdated()
@@ -685,12 +575,10 @@ public class Menu
     /**
      * Option to edit stored password title.
      */
-    private void editPasswordTitle()
-    {
+    private void editPasswordTitle() {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >> ", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
-        if (confirmPassword(passwordId))
-        {
+        if (confirmPassword(passwordId)) {
             passwords.editPasswordTitle(passwordId, getValidTitleFromUser());
             savePasswords();
         }
@@ -699,12 +587,10 @@ public class Menu
     /**
      * Option to edit stored password website.
      */
-    private void editPasswordWebsite()
-    {
+    private void editPasswordWebsite() {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >> ", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
-        if (confirmPassword(passwordId))
-        {
+        if (confirmPassword(passwordId)) {
             passwords.editPasswordWebsite(passwordId, getValidWebsiteFromUser());
             savePasswords();
         }
@@ -713,20 +599,15 @@ public class Menu
     /**
      * Option to edit stored password password.
      */
-    private void editPasswordPassword()
-    {
+    private void editPasswordPassword() {
         int passwordId = Utilities.getInt(terminal, "Enter stored password id >> ", 0, StoredPassword.getHighestTotalId());
         terminal.info("You are about to edit this entry:\n");
-        if (confirmPassword(passwordId))
-        {
+        if (confirmPassword(passwordId)) {
             String password = getValidPasswordFromUser(true);
-            if (checkPasswordUsage(password))
-            {
+            if (checkPasswordUsage(password)) {
                 passwords.editPasswordPassword(passwordId, password);
                 savePasswords();
-            }
-            else
-            {
+            } else {
                 terminal.info("Password not added.\n");
             }
         }
@@ -736,11 +617,9 @@ public class Menu
      * Writes all stored passwords in the current object's password storage into
      * passwords file.
      */
-    private void savePasswords()
-    {
+    private void savePasswords() {
         boolean done = passwords.readPasswordsOut(DEFAULT_USER_PASSWORDS_PATH, this.key);
-        if (!done)
-        {
+        if (!done) {
             this.terminal.error(ERR_STORE_PASSWORDS);
         }
     }
@@ -749,11 +628,9 @@ public class Menu
      * Loads all stored passwords into the current object's password storage
      * from passwords file.
      */
-    private void loadPasswords()
-    {
+    private void loadPasswords() {
         boolean done = passwords.readPasswordsIn(DEFAULT_USER_PASSWORDS_PATH, this.key);
-        if (!done)
-        {
+        if (!done) {
             this.terminal.error(ERR_LOAD_PASSWORDS);
         }
     }

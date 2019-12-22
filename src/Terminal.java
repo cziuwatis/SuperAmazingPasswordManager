@@ -27,6 +27,10 @@ public class Terminal {
     public static final String COLOR_WHITE = "\u001B[38;5;15m";
     public static final String COLOR_RESET = "\u001B[0m";
 
+    /**
+     * Returns an ArrayList of ANSI-Color compatible terminals.
+     * @return list of ANSI-Color compatible terminals.
+     */
     private static ArrayList<String> getColorTerms() {
         ArrayList<String> colorTerms = new ArrayList<>();
         colorTerms.add("xterm-256color");
@@ -36,6 +40,10 @@ public class Terminal {
         return colorTerms;
     }
 
+    /**
+     * Returns a String containing a sample color palette.
+     * @return a String containing a sample color palette.
+     */
     private static String sampleColors() {
         return COLOR_GRAY + "K" + COLOR_RED + "R" + COLOR_GREEN + "G" + COLOR_YELLOW + "Y" + COLOR_BLUE + "B" +
                 COLOR_MAGENTA + "M" + COLOR_CYAN + "C" + COLOR_WHITE + "W" + COLOR_RESET;
@@ -48,6 +56,10 @@ public class Terminal {
     private boolean supportsAnsi;
     private Properties settings;
 
+    /**
+     * Terminal is an abstraction class for dealing with text based terminals. It will test for color support as well
+     * as allow for native password entering.
+     */
     public Terminal() {
         // Set up input/output streams
         this.console = System.console();
@@ -123,7 +135,7 @@ public class Terminal {
         }
     }
 
-    public boolean detectColor() {
+    private boolean detectColor() {
         // Try to auto detect ANSI color support
         String termType = System.getenv().get("TERM");
         if (termType != null) {
@@ -139,7 +151,6 @@ public class Terminal {
     }
 
     private boolean askColor() {
-
         this.outputWriter.println("\t[!] Warning! Could not detect whether color is supported by this terminal.");
         this.outputWriter.printf("\t[!] Try use color anyway? (Color Sample: [%s]\n", sampleColors());
         this.outputWriter.print("Yes / No >> ");
@@ -161,18 +172,34 @@ public class Terminal {
         return false;
     }
 
+    /**
+     * Returns a Scanner object for getting user input from the terminal.
+     * @return a Scanner object.
+     */
     public Scanner getInputScanner() {
         return this.inputScanner;
     }
 
+    /**
+     * Returns a Printwriter object connected to the terminals output.
+     * @return a Printwriter object.
+     */
     public PrintWriter getOutputWriter() {
         return this.outputWriter;
     }
 
+    /**
+     * Returns a Printwriter object connected to the terminals error output. May return the same as getOutputWriter().
+     * @return a Printwriter object.
+     */
     public PrintWriter getErrorWriter() {
         return this.errorWriter;
     }
 
+    /**
+     * Reads a user-entered password from the terminal.
+     * @return a user-entered password from the terminal.
+     */
     public String readPassword() {
         if (this.console != null) {
             return new String(this.console.readPassword());
@@ -181,6 +208,11 @@ public class Terminal {
         }
     }
 
+    /**
+     * Reads a user-entered password from the terminal.
+     * @param prompt prompt to print before getting input.
+     * @return a user-entered password from the terminal.
+     */
     public String readPassword(String prompt) {
         this.outputWriter.print(prompt);
         this.outputWriter.flush();
@@ -191,6 +223,10 @@ public class Terminal {
         }
     }
 
+    /**
+     * Reads a user-entered String from the terminal.
+     * @return a user-entered String from the terminal.
+     */
     public String readLine() {
         if (this.console != null) {
             return this.console.readLine();
@@ -199,6 +235,11 @@ public class Terminal {
         }
     }
 
+    /**
+     * Reads a user-entered String from the terminal.
+     * @param prompt prompt to print before getting input.
+     * @return a user-entered String from the terminal.
+     */
     public String readLine(String prompt) {
         this.outputWriter.print(prompt);
         this.outputWriter.flush();
@@ -209,6 +250,10 @@ public class Terminal {
         }
     }
 
+    /**
+     * Prints to the terminal.
+     * @param text text to be printed.
+     */
     public void info(String text) {
         if (!this.supportsAnsi) {
             text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
@@ -217,6 +262,10 @@ public class Terminal {
         this.outputWriter.flush();
     }
 
+    /**
+     * Prints a warning to the terminal. Will be prefixed with [Warning] and coloured yellow if color is supported.
+     * @param text text to be printed.
+     */
     public void warn(String text) {
         if (!this.supportsAnsi) {
             text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
@@ -228,6 +277,10 @@ public class Terminal {
         this.outputWriter.flush();
     }
 
+    /**
+     * Prints an error to the terminal. Will be prefixed with [Error] and coloured red if color is supported.
+     * @param text text to be printed.
+     */
     public void error(String text) {
         if (!this.supportsAnsi) {
             text = text.replaceAll("\u001B\\[38;5;[0-9]+m", "");
