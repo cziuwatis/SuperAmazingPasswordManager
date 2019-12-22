@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Login {
 
-    public static final String LOGIN_TEXT = "Enter master password (or 'q' to quit):\n";
+    public static final String LOGIN_TEXT = Terminal.COLOR_YELLOW + "Enter master password (or 'q' to quit):\n" + Terminal.COLOR_RESET;
     public static final String LOGIN_PROMPT = ">> ";
     public static final String WARN_FNF = "Could not load user file. Create one now?\n";
     public static final String WARN_NO_USER_DATA = "Couldn't read user data. Create new user?\n\t(Note: Currently stored data will become unreadable)\n";

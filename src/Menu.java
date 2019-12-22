@@ -27,15 +27,42 @@ public class Menu
     private static final String ERR_STORE_PASSWORDS = "Could not store passwords in file.";
     private static final String ERR_CMD = "Invalid command entered!";
     private static final String INPUT_PROMPT = "Enter >> ";
-    private static final String HELP_TEXT = "";
-    private static final String MAIN_MENU_OPTIONS = " 1. Add new password\n 2. View passwords\n 3. Edit passwords\n 4. Remove passwords\n 5. Change master password\n H. Help\n Q. Quit";
-    private static final String EDIT_PASSWORDS_MENU_OPTIONS = " 1. Edit password title\n 2. Edit password website\n 3. Edit password password\n B. Back";
-    private static final String VIEW_PASSWORDS_MENU_OPTIONS = " 1. View all entries\n 2. Search by title\n 3. Search by website\n B. Back";
-    private static final String GENERATE_PASSWORDS_OPTIONS = " 1. Generate easy to read password\n 2. Generate unrestricted password";
+    private static final String HELP_TEXT =
+            Terminal.COLOR_CYAN + "Super Amazing Password Manager" + Terminal.COLOR_RESET +
+                    " is a tool to help you store all of your passwords for easy retrieval.\n" +
+                    "Once you are logged in, you can navigate the menu by entering the key with the corresponding option.\n" +
+                    "ALl navigating is text based, " +
+                    Terminal.COLOR_RED + "the mouse is not used. " + Terminal.COLOR_RESET + "\n" +
+                    "The program will tell you what to enter in order to proceed at each step.\n" +
+                    "Thank you for using Super Amazing Password Manager!";
+    private static final String MAIN_MENU_OPTIONS =
+            Terminal.COLOR_BLUE + " 1. " + Terminal.COLOR_RESET + "Add new password\n" +
+                    Terminal.COLOR_BLUE + " 2. " + Terminal.COLOR_RESET + "View passwords\n" +
+                    Terminal.COLOR_BLUE + " 3. " + Terminal.COLOR_RESET + "Edit passwords\n" +
+                    Terminal.COLOR_BLUE + " 4. " + Terminal.COLOR_RESET + "Remove passwords\n" +
+                    Terminal.COLOR_BLUE + " 5. " + Terminal.COLOR_RESET + "Change master password\n" +
+                    Terminal.COLOR_GREEN + " H. " + Terminal.COLOR_RESET + "Help\n" +
+                    Terminal.COLOR_RED + " Q. " + Terminal.COLOR_RESET + "Quit";
+    private static final String EDIT_PASSWORDS_MENU_OPTIONS =
+            Terminal.COLOR_BLUE + " 1. " + Terminal.COLOR_RESET + "Edit password title\n" +
+                    Terminal.COLOR_BLUE + " 2. " + Terminal.COLOR_RESET + "Edit password website\n" +
+                    Terminal.COLOR_BLUE + " 3. " + Terminal.COLOR_RESET + "Edit password password\n" +
+                    Terminal.COLOR_RED + " B. " + Terminal.COLOR_RESET + "Back";
+    private static final String VIEW_PASSWORDS_MENU_OPTIONS =
+            Terminal.COLOR_BLUE + " 1. " + Terminal.COLOR_RESET + "View all entries\n" +
+                    Terminal.COLOR_BLUE + " 2. " + Terminal.COLOR_RESET + "Search by title\n" +
+                    Terminal.COLOR_BLUE + " 3. " + Terminal.COLOR_RESET + "Search by website\n" +
+                    Terminal.COLOR_RED + " B. " + Terminal.COLOR_RESET + "Back";
+    private static final String GENERATE_PASSWORDS_OPTIONS =
+            Terminal.COLOR_BLUE + " 1. " + Terminal.COLOR_RESET + "Generate easy to read password\n" +
+                    Terminal.COLOR_BLUE + " 2. " + Terminal.COLOR_RESET + "Generate unrestricted password";
     private static final String DEFAULT_BORDER = "-";
+    private static final int DEFAULT_BORDER_LENGTH = 130;
     private static final String DEFAULT_USER_PASSWORDS_PATH = "passwordStore.txt";
     private static final String DEFAULT_USER_FILEPATH = "user.txt";
-    private static final int DEFAULT_BORDER_LENGTH = 130;
+    public static final String MENU_TITLE = Terminal.COLOR_CYAN + "SUPER AMAZING PASSWORD MANAGER" + Terminal.COLOR_RESET;
+    public static final String MENU_HELP_TITLE = Terminal.COLOR_GREEN + "HELP MENU" + Terminal.COLOR_RESET;
+    public static final String MENU_GENPASS_TITLE = Terminal.COLOR_MAGENTA + "GENERATE PASSWORD" + Terminal.COLOR_RESET;
 
     /*
      *  FIELDS
@@ -69,7 +96,7 @@ public class Menu
         loadPasswords();
         while (this.running)
         {
-            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, MAIN_MENU_OPTIONS, "MAIN MENU");
+            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, MAIN_MENU_OPTIONS, MENU_TITLE);
             String command = terminal.readLine(INPUT_PROMPT);
             if (command.trim().length() == 1)
             {
@@ -103,7 +130,7 @@ public class Menu
                     }
                     case HELP_CHAR:
                     {
-                        Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, HELP_TEXT, "HELP TEXT");
+                        Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, HELP_TEXT, MENU_HELP_TITLE);
                         break;
                     }
                     case QUIT_CHAR:
@@ -304,7 +331,7 @@ public class Menu
         boolean runMenu = true;
         while (runMenu)
         {
-            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, GENERATE_PASSWORDS_OPTIONS, "GENERATE PASSWORDS MENU");
+            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, GENERATE_PASSWORDS_OPTIONS, MENU_GENPASS_TITLE);
             String command = terminal.readLine(INPUT_PROMPT);
             if (command.trim().length() == 1)
             {
