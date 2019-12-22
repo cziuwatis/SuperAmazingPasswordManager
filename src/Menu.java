@@ -63,6 +63,7 @@ public class Menu
     public static final String MENU_TITLE = Terminal.COLOR_CYAN + "SUPER AMAZING PASSWORD MANAGER" + Terminal.COLOR_RESET;
     public static final String MENU_HELP_TITLE = Terminal.COLOR_GREEN + "HELP MENU" + Terminal.COLOR_RESET;
     public static final String MENU_GENPASS_TITLE = Terminal.COLOR_MAGENTA + "GENERATE PASSWORD" + Terminal.COLOR_RESET;
+    public static final String MENU_VIEW_TITLE = Terminal.COLOR_CYAN + "VIEW PASSWORDS" + Terminal.COLOR_RESET;
 
     /*
      *  FIELDS
@@ -268,7 +269,7 @@ public class Menu
                 if (password.length() == 0 && askToGeneratePassword)
                 {
                     password = generatePasswordMenu();
-                    terminal.info("Generated password: " + password + "\n");
+                    terminal.info(Terminal.COLOR_BLUE + "Generated password: " + Terminal.COLOR_RESET + password + "\n");
                 }
                 else
                 {
@@ -372,7 +373,7 @@ public class Menu
         boolean runMenu = true;
         while (runMenu)
         {
-            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, VIEW_PASSWORDS_MENU_OPTIONS, "VIEW PASSWORDS MENU");
+            Utilities.printMenu(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH, VIEW_PASSWORDS_MENU_OPTIONS, MENU_VIEW_TITLE);
             String command = terminal.readLine(INPUT_PROMPT);
             if (command.trim().length() == 1)
             {
@@ -554,17 +555,26 @@ public class Menu
     {
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");
-        terminal.info(String.format("%-7s  %-20s  %-30s     %s\n", "ID", "   Title", "  Website", "Password"));
+        terminal.info(String.format(Terminal.COLOR_BLUE + "%-7s   %-20s   %-30s   %s" + Terminal.COLOR_RESET + "\n",
+                "ID", "Title", "Website", "Password"));
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");
         for (StoredPassword entry : entries)
         {
             String password = "**********";
+            if(passwords.isDuplicate(entry.getPassword())) {
+                password = Terminal.COLOR_YELLOW + password + " [Duplicate]" + Terminal.COLOR_RESET;
+            }
             if (!hidePassword)
             {
                 password = entry.getPassword();
+                if(passwords.isDuplicate(password)) {
+                    password = Terminal.COLOR_YELLOW + password + " [Duplicate]" + Terminal.COLOR_RESET;
+                }
             }
-            terminal.info(String.format("%-7d | %-20s | %-30s | %s\n", entry.getId(), Utilities.cutAndAppendString(entry.getTitle(), 20 - 2, ".."), Utilities.cutAndAppendString(entry.getWebsite(), 30 - 2, ".."), password));
+            terminal.info(String.format(Terminal.COLOR_MAGENTA + "%-7d" + Terminal.COLOR_RESET + " | %-20s | %-30s | %s\n",
+                    entry.getId(), Utilities.cutAndAppendString(entry.getTitle(), 20 - 2, ".."),
+                    Utilities.cutAndAppendString(entry.getWebsite(), 30 - 2, ".."), password));
         }
         Utilities.printString(terminal, DEFAULT_BORDER, DEFAULT_BORDER_LENGTH);
         terminal.info("\n");
@@ -662,9 +672,9 @@ public class Menu
         StoredPassword passwordDetails = passwords.getPasswordDetails(passwordId);
         if (passwordDetails != null)
         {
-            terminal.info("Title        : " + passwordDetails.getTitle()
-                    + "\nWebsite      : " + passwordDetails.getWebsite()
-                    + "\nLast updated : " + passwordDetails.getLastUpdated()
+            terminal.info(Terminal.COLOR_BLUE + "Title        : " + Terminal.COLOR_RESET + passwordDetails.getTitle() +
+                    Terminal.COLOR_BLUE + "\nWebsite      : " + Terminal.COLOR_RESET + passwordDetails.getWebsite() +
+                    Terminal.COLOR_BLUE + "\nLast updated : " + Terminal.COLOR_RESET + passwordDetails.getLastUpdated()
                     + "\n");
             return true;
         }

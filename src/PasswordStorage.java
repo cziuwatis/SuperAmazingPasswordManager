@@ -213,6 +213,24 @@ public class PasswordStorage {
     }
 
     /**
+     * Checks whether specified password is used two or more times.
+     * @param password password to check for.
+     * @return true if the password has been used in at least two entries.
+     */
+    public boolean isDuplicate(String password) {
+        int count = 0;
+        for (StoredPassword userPassword : this.userPasswords) {
+            if (userPassword.getPassword().equals(password)) {
+                count++;
+                if(count >= 2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Encrypts using AES and the specified key, and writes all 
      * storedPasswords into the specified file in filePath in CSV format.
      * @param filePath path of where to write the passwords to.
