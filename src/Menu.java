@@ -57,7 +57,7 @@ public class Menu
             Terminal.COLOR_BLUE + " 1. " + Terminal.COLOR_RESET + "Generate easy to read password\n" +
                     Terminal.COLOR_BLUE + " 2. " + Terminal.COLOR_RESET + "Generate unrestricted password";
     private static final String DEFAULT_BORDER = "-";
-    private static final int DEFAULT_BORDER_LENGTH = 130;
+    private static final int DEFAULT_BORDER_LENGTH = 80;
     private static final String DEFAULT_USER_PASSWORDS_PATH = "passwordStore.txt";
     private static final String DEFAULT_USER_FILEPATH = "user.txt";
     public static final String MENU_TITLE = Terminal.COLOR_CYAN + "SUPER AMAZING PASSWORD MANAGER" + Terminal.COLOR_RESET;
