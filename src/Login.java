@@ -24,7 +24,7 @@ public class Login {
     public static final String WARN_NO_USER_DATA = "Couldn't read user data. Create new user?\n\t(Note: Currently stored data will become unreadable)\n";
     public static final String ERR_NO_USER_DATA = "Couldn't read user data.\n";
     public static final String WARN_WEAK_PASSWORD = "Your password does not meet minimum requirements! Please use a stronger password.\n";
-    public static final String ERR_EXIT = "Exiting...";
+    public static final String ERR_EXIT = "Exiting...\n";
     public static final String ERR_WRITE = "Could not write to user file!\n";
     public static final String ERR_COMMON_FILE_MISSING = "Could not check against list of common passwords.\n";
     public static final String INCORRECT_PASSWORD = "Invalid password! Try again in %d seconds\n";
@@ -52,14 +52,7 @@ public class Login {
                 this.decryptSalt = inFile.nextLine();
             }
         } catch (FileNotFoundException e) {
-            this.terminal.warn(WARN_FNF);
-            if (Utilities.getYesNoAnswer(this.terminal, "Yes/No >> ")) {
-                this.createNewUser();
-            } else {
-                this.terminal.error(ERR_NO_USER_DATA);
-                this.terminal.error(ERR_EXIT);
-                System.exit(1);
-            }
+            this.createNewUser();
         }
     }
 
@@ -117,12 +110,17 @@ public class Login {
 
     public void createNewUser() {
         this.masterSalt = Password.generateRandomSalt();
-        this.terminal.info("Please enter a master password. This will be used to encrypt all of your passwords.\n");
-        this.terminal.info("Please use a strong password that you have not used on any other sites.\n");
-        this.terminal.info("Passwords have the following restrictions:\n");
-        this.terminal.info("\t- Minimum 8 characters\n\t- At least one uppercase letter\n"
-                + "\t- At least one lowercase letter\n\t- At least one number\n\t- At least one symbol\n"
-                + "\t- Not a commonly used password (123456, P@ssw0rd, etc.)\n");
+        this.terminal.info(Terminal.COLOR_YELLOW + "Please enter a master password." + Terminal.COLOR_RESET +
+                " This will be used to encrypt all of your passwords.\n" +
+                Terminal.COLOR_RED + "Please use a strong password that you have not used on any other sites.\n" +
+                Terminal.COLOR_RESET +
+                "Passwords have the following restrictions:\n" +
+                Terminal.COLOR_BLUE + "\t- " + Terminal.COLOR_RESET + "Minimum 8 characters\n" +
+                Terminal.COLOR_BLUE + "\t- " + Terminal.COLOR_RESET + "At least one uppercase letter\n" +
+                Terminal.COLOR_BLUE + "\t- " + Terminal.COLOR_RESET + "At least one lowercase letter\n" +
+                Terminal.COLOR_BLUE + "\t- " + Terminal.COLOR_RESET + "At least one number\n" +
+                Terminal.COLOR_BLUE + "\t- " + Terminal.COLOR_RESET + "At least one symbol\n" +
+                Terminal.COLOR_BLUE + "\t- " + Terminal.COLOR_RESET + "Not a commonly used password (123456, P@ssw0rd, etc.)\n");
         boolean needPassword = true;
         String masterPassword = null;
         while (needPassword) {

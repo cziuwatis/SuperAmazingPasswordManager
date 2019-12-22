@@ -22,7 +22,7 @@ public class Application {
         String key = login.login();
         if (key == null) {
             terminal.error("Couldn't log in!\n");
-            terminal.error("Exiting...");
+            terminal.error("Exiting...\n");
             System.exit(1);
         }
         menu.run(key);
